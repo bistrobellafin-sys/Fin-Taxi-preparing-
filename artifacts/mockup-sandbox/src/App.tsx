@@ -39,8 +39,21 @@ import {
   X,
   Zap,
 } from "lucide-react";
+import {
+  evidenceFor,
+  evidenceRegistry,
+  knowledgeAudit,
+  knowledgeGlossary,
+  knowledgeLessons,
+  knowledgeModules,
+  knowledgeQuestions,
+  mockExams,
+  sourceFor,
+  sourceRegistry,
+  type SourceStatus,
+} from "./knowledgeBase";
 
-type NavKey = "home" | "path" | "quiz" | "glossary" | "sources";
+type NavKey = "home" | "path" | "quiz" | "glossary" | "sources" | "knowledge";
 type Question = {
   category: string;
   finnish: string;
@@ -49,6 +62,10 @@ type Question = {
   answer: number;
   explanation: string;
   source: string;
+  sourcePage?: string;
+  evidenceId?: string;
+  trainingQuestion?: boolean;
+  officialExamQuestion?: boolean;
 };
 
 type StudyProgress = {
@@ -121,8 +138,8 @@ const modules = [
     eyebrow: "الأساسيات",
     title: "مسار Taksi Helsinki",
     description: "افهم مراحل التقديم والتدريب كما تنشرها الشركة، بدون خلطها بمتطلبات Traficom.",
-    duration: "35 دقيقة",
-    lessons: 5,
+    duration: "55 دقيقة",
+    lessons: 9,
     progress: 82,
     icon: ShieldCheck,
     color: "amber",
@@ -147,8 +164,8 @@ const modules = [
     eyebrow: "الخدمة الخاصة",
     title: "Kela والرحلات الخاصة",
     description: "خريطة عملية لما هو منشور عن رحلات Kela، مع فصل قواعد Kela عن قواعد الشركة.",
-    duration: "42 دقيقة",
-    lessons: 6,
+    duration: "75 دقيقة",
+    lessons: 13,
     progress: 16,
     icon: HeartPulseIcon,
     color: "teal",
@@ -160,8 +177,8 @@ const modules = [
     eyebrow: "العمل الميداني",
     title: "Helsinki في يوم السائق",
     description: "ملاحظات للمراجعة حول الأماكن والرحلات، مع تنبيه واضح عندما لا توجد قائمة تشغيلية عامة.",
-    duration: "45 دقيقة",
-    lessons: 7,
+    duration: "60 دقيقة",
+    lessons: 11,
     progress: 0,
     icon: Map,
     color: "violet",
@@ -170,7 +187,14 @@ const modules = [
   },
 ];
 
-const questions: Question[] = [
+const moduleSourceUrls: Record<string, string> = {
+  "01": "https://taksihelsinki.fi/taksi-helsinki/taksi-helsingin-kuljettajakoulutus/",
+  "02": "https://traficom.fi/en/commercial-transport/drivers-licenses-and-qualifications/apply-taxi-driving-licence",
+  "03": "https://www.kela.fi/transport-by-taxi",
+  "04": "https://taksihelsinki.fi/en/frontpage/",
+};
+
+const legacyQuestions: Question[] = [
   {
     category: "Taksi Helsinki",
     finnish: "Kuinka monta koulutusosiota Taksi Helsingin kuljettajakoulutuksessa on?",
@@ -360,7 +384,36 @@ const questions: Question[] = [
     explanation: "تذكر الصفحة الرسمية أن كل سائق يعمل في نظام الإرسال لديها يملك تصريح سائق تاكسي ساريًا.",
     source: "Taksi Helsinki · Front page",
   },
+  {
+    category: "Kela · بيانات الحجز",
+    finnish: "Mitä tietoa Kela-taksin välityskeskus tarvitsee varauksen yhteydessä?",
+    arabic: "ما المعلومة التي يحتاجها مركز طلب Kela عند الحجز؟",
+    options: ["الرمز السري للتطبيق", "الرقم الشخصي للعميل", "كلمة مرور البنك", "لا يحتاج أي معلومة"],
+    answer: 1,
+    explanation: "توضح Kela أن الرقم الشخصي مطلوب عند حجز الرحلة لأن الرحلات تُحتسب ضمن الحد السنوي وتُدفع التعويضات لمقدم الخدمة. لا تطلب المنصة هذه البيانات.",
+    source: "Kela · Using a taxi",
+  },
+  {
+    category: "Kela · السائق المألوف",
+    finnish: "Kuka voi saada oikeuden tuttuun taksinkuljettajaan tietyissä tilanteissa?",
+    arabic: "من يمكن أن يحق له استخدام سائق تاكسي مألوف في حالات محددة؟",
+    options: ["كل عميل تلقائيًا", "طفل دون 16 عامًا يسافر وحده بانتظام للعلاج أو التأهيل", "أي سائح", "لا أحد"],
+    answer: 1,
+    explanation: "تذكر Kela أن الأطفال دون 16 عامًا الذين يسافرون وحدهم بانتظام للعلاج أو التأهيل لهم هذا الحق، كما توجد حالات صحية محددة أخرى بقرار Kela.",
+    source: "Kela · Using a taxi",
+  },
+  {
+    category: "Kela · سهولة الوصول",
+    finnish: "Miten voi varata Kela-taksin, jos asiakkaalla on kuulo- tai puhevamma?",
+    arabic: "كيف يمكن حجز تاكسي Kela لمن لديه إعاقة سمع أو كلام؟",
+    options: ["برسالة نصية بعد تهيئة البيانات أول مرة", "من أي سيارة في الشارع", "لا يمكن الحجز", "من خلال اختبار القيادة"],
+    answer: 0,
+    explanation: "توضح Kela أن الحجز بالرسالة النصية ممكن؛ يجب أولًا الاتصال بمركز الطلب لتسجيل البيانات، ثم يمكن استخدام رقم الرسائل المخصص للمركز.",
+    source: "Kela · Using a taxi",
+  },
 ];
+
+const questions: Question[] = [...legacyQuestions, ...knowledgeQuestions];
 
 const glossary = [
   ["Kuljettaja", "السائق", "الشخص الذي يقود السيارة ويخدم العميل."],
@@ -385,6 +438,11 @@ const glossary = [
   ["Sote-taksi", "تاكسي الخدمات الاجتماعية والصحية", "نوع خدمة تذكره Taksi Helsinki في مناطق محددة على صفحتها العامة؛ تحقق من المناطق الحالية."],
 ];
 
+const glossaryTerms: string[][] = [
+  ...glossary,
+  ...knowledgeGlossary.map((entry) => [entry.term, entry.meaning, entry.explanation, entry.sourceLabel]),
+];
+
 const moduleDetails = {
   "01": [
     ["01", "Suomen kielen tasotesti", "تقييم مستوى اللغة الفنلندية قبل شراء التدريب، مع استثناءات محددة لمن يملك شهادة دراسية باللغة الفنلندية."],
@@ -392,6 +450,10 @@ const moduleDetails = {
     ["03", "Verkkokoulutus ja koe", "التدريب الإلكتروني والاختبار باللغة الفنلندية، ويشمل الخدمة، الأجهزة والعدادات، المعرفة المحلية، وحزمة معلومات السائق."],
     ["04", "Koulutusajo", "تدريب قيادة إلزامي بعد اجتياز اختبار الشركة، يستغرق نحو 8 ساعات ويتضمن تدريبًا عمليًا على الأجهزة وأهم الأماكن."],
     ["05", "Käytännön oppimisjakso", "فترة تعلم عملي تقارب 50 وردية تحت إشراف صاحب العمل، كما تذكر الصفحة الرسمية."],
+    ["06", "طبيعة عمل السائق", "تصف Taksi Helsinki العمل بأنه خدمة للعملاء، متنوع ومستقل لكنه مسؤول؛ لا توجد ورديتان أو مقابلتان متطابقتان تمامًا."],
+    ["07", "صفات السائق", "تذكر الشركة أهمية الموقف الإيجابي تجاه الخدمة، احترام العميل، الهدوء، الصبر، والقدرة على التركيز في عدة أمور وحل المواقف باستقلالية."],
+    ["08", "اللغة الفنلندية", "توضح Taksi Helsinki أنها تشترط القدرة على خدمة العملاء باللغة الفنلندية، وأن تدريبها واختبارها يُجرَيان باللغة الفنلندية."],
+    ["09", "التدريب المستمر", "تذكر الشركة أنها تنظم تدريبات وتمارين سنوية، وتتابع مستوى المهارة خصوصًا عند ظهور انحرافات في الجودة."],
   ],
   "02": [
     ["01", "اختبار الشركة أم Traficom؟", "هذا المسار يشرح الفارق: اختبار Taksi Helsinki جزء من تدريب الشركة، أما اختبار Traficom فهو شرط رخصة قيادة التاكسي الحكومية."],
@@ -417,6 +479,11 @@ const moduleDetails = {
     ["04", "تدريب المجموعات الخاصة", "تذكر Taksi Helsinki أن التدريب الكامل 21 ساعة، منها 14 ساعة نظرية و7 ساعات عملية، مع قاعدة مختلفة لمن حصل على رخصته قبل 1 يوليو 2018."],
     ["05", "وقت وصول سيارة Kela", "تذكر Kela أن السيارة ينبغي أن تصل خلال 15 دقيقة من وقت الاستلام المتفق عليه. عند عدم الوصول، اتصل بمركز الطلب الذي حُجزت منه الرحلة."],
     ["06", "حدود المعرفة العامة", "تفاصيل نظام السائق الداخلية أو أزرار Autocab لا تُعرض هنا كحقائق ما لم نجد لها دليلًا رسميًا عامًا قابلًا للتحقق."],
+    ["07", "معلومات الاستحقاق", "توضح Kela أن مركز الطلب يتلقى معلومات عن حق العميل في التعويض ونوع المركبة وحق السائق المألوف والمبلغ الذي يدفعه العميل، وفق البيانات المتاحة له."],
+    ["08", "المساعدة والأجهزة", "يمكن للعميل طلب إضافة معلومات مستمرة عن الحاجة إلى مساعدة خاصة أو وجود أجهزة مساعدة؛ هذه المعلومة تساعد في ترتيب الرحلة."],
+    ["09", "الرحلة المشتركة", "تذكر Kela أن استخدام السائق المألوف لا يمنع بالضرورة مشاركة الرحلة مع عملاء آخرين يسافرون في الاتجاه نفسه."],
+    ["10", "الحجز بالرسالة النصية", "تتيح Kela طريقة الرسائل النصية لمن لديه إعاقة سمع أو كلام بعد تسجيل البيانات أول مرة لدى مركز الطلب."],
+    ["11", "حدود المعرفة العامة", "لا نعرض أرقامًا أو تعليمات منطقة متغيرة كقاعدة دائمة؛ راجع صفحة Kela ومركز الطلب الحالي قبل الرحلة."],
   ],
   "04": [
     ["01", "المعرفة المحلية", "تدرج Taksi Helsinki معرفة pääkaupunkiseutu ضمن التدريب الإلكتروني، كما يذكر التدريب العملي التعرف على الأماكن المهمة."],
@@ -426,6 +493,10 @@ const moduleDetails = {
     ["05", "نطاق الخدمة المنشور", "تقول الصفحة الرسمية إن الشركة تعمل في منطقة العاصمة وتتوسع على المستوى الوطني، وتذكر مناطق محددة لخدمات Kela وSote. يجب التحقق من الصفحة الحالية قبل اعتماد أي منطقة تشغيلية."],
     ["06", "المطار والموانئ", "هذه المنصة لا تخترع مناطق انتظار أو مسارات تشغيلية؛ راجع تعليمات الشركة الحالية أو التدريب المدفوع عند توفرها."],
     ["07", "حدود المعرفة العامة", "لا توجد في المصادر المفتوحة المفحوصة خريطة تشغيلية كاملة أو دليل عام يشرح كل إجراءات السائق الداخلية، لذلك نترك هذه النقاط معلّمة بدل التخمين."],
+    ["08", "التوسع ومناطق الخدمة", "تذكر الصفحة العامة أن Taksi Helsinki تعمل في منطقة العاصمة وتتوسع وطنيًا، لكنها تفصل مناطق خدمات Kela وSote؛ تحقق من الصفحة الحالية بدل حفظ قائمة قديمة."],
+    ["09", "الخدمة الآمنة والمتاحة", "تصف Taksi Helsinki هدفها بأنه تقديم خدمة عالية الجودة وآمنة ومتاحة، وهذه مبادئ خدمة عامة وليست تعليمات تشغيلية داخلية."],
+    ["10", "مراقبة الجودة", "تقول الشركة إنها تراقب رضا العملاء باستمرار وتطور الخدمة وفق احتياجاتهم وتوقعاتهم."],
+    ["11", "المصدر المفتوح وحدوده", "المعلومات المنشورة لا تعطي خريطة انتظار للمطار أو الموانئ ولا خطوات تشغيلية لكل موقف؛ لذلك لا نضع مسارات أو تعليمات من عندنا."],
   ],
 };
 
@@ -465,7 +536,7 @@ function App() {
   const currentQuestion = questions[quizIndex];
   const quizScore = Object.entries(answers).filter(([index, answer]) => questions[Number(index)].answer === answer).length;
   const filteredGlossary = useMemo(
-    () => glossary.filter(([term, meaning]) => `${term} ${meaning}`.toLowerCase().includes(glossarySearch.toLowerCase())),
+    () => glossaryTerms.filter(([term, meaning]) => `${term} ${meaning}`.toLowerCase().includes(glossarySearch.toLowerCase())),
     [glossarySearch],
   );
 
@@ -516,6 +587,7 @@ function App() {
     { key: "quiz", label: "بنك الأسئلة", icon: CircleHelp },
     { key: "glossary", label: "قاموس السائق", icon: Languages },
     { key: "sources", label: "المصادر الرسمية", icon: Library },
+    { key: "knowledge", label: "قاعدة المعرفة", icon: FileCheck2 },
   ];
 
   return (
@@ -547,10 +619,83 @@ function App() {
         {activeNav === "path" && <TrainingPath selectedModule={selectedModule} onSelectModule={setSelectedModule} onStartQuiz={startQuiz} />}
         {activeNav === "quiz" && <QuizView started={quizStarted} completed={quizCompleted} startQuiz={startQuiz} currentQuestion={currentQuestion} quizIndex={quizIndex} selectedAnswer={selectedAnswer} answers={answers} quizScore={quizScore} onAnswer={answerQuestion} onNext={nextQuestion} onRestart={startQuiz} onBack={() => { setQuizStarted(false); setQuizCompleted(false); setActiveNav("home"); }} />}
         {activeNav === "glossary" && <Glossary search={glossarySearch} onSearch={setGlossarySearch} terms={filteredGlossary} />}
-        {activeNav === "sources" && <Sources />}
+        {activeNav === "sources" && <SourceRegistryView />}
+        {activeNav === "knowledge" && <KnowledgeBaseView />}
       </main>
     </div>
   );
+}
+
+type SourceCheckState = "checking" | "reachable" | "unchanged" | "changed" | "unavailable" | "restricted";
+type SourceCheck = { state: SourceCheckState; httpStatus?: number; message: string };
+
+function SourceRegistryView() {
+  const [statusFilter, setStatusFilter] = useState<"all" | "current" | "historical" | "future" | "restricted">("all");
+  const [query, setQuery] = useState("");
+  const [verification, setVerification] = useState<Record<string, SourceCheck>>({});
+  const [isVerifying, setIsVerifying] = useState(false);
+  const normalizedQuery = query.trim().toLowerCase();
+  const filteredSources = useMemo(() => sourceRegistry.filter((source) => {
+    const statusMatch = statusFilter === "all" || (statusFilter === "current" && source.status === "official_current") || (statusFilter === "historical" && source.status === "official_historical") || (statusFilter === "future" && source.status === "official_future") || (statusFilter === "restricted" && source.status === "access_restricted");
+    const searchable = [source.title, source.publisher, source.documentType, source.topics.join(" "), source.notes ?? ""].join(" ").toLowerCase();
+    return statusMatch && (!normalizedQuery || searchable.includes(normalizedQuery));
+  }), [normalizedQuery, statusFilter]);
+
+  async function verifySources() {
+    setIsVerifying(true);
+    const checking: Record<string, SourceCheck> = {};
+    sourceRegistry.forEach((source) => {
+      checking[source.id] = { state: "checking", message: "جارٍ فحص الرابط" };
+    });
+    setVerification(checking);
+
+    const results: Record<string, SourceCheck> = {};
+    await Promise.all(sourceRegistry.map(async (source) => {
+      if (source.status === "access_restricted") {
+        results[source.id] = { state: "restricted", message: "ACCESS_RESTRICTED · لم يُطلب المحتوى" };
+        return;
+      }
+      const controller = new AbortController();
+      const timeoutId = window.setTimeout(() => controller.abort(), 8000);
+      try {
+        const hasBaseline = source.contentHash !== "not_computed_in_static_build";
+        const response = await fetch(source.url, { method: hasBaseline ? "GET" : "HEAD", cache: "no-store", signal: controller.signal });
+        if (!response.ok) {
+          results[source.id] = { state: "unavailable", httpStatus: response.status, message: "HTTP غير ناجح أو المصدر غير متاح" };
+          return;
+        }
+        if (!hasBaseline) {
+          results[source.id] = { state: "reachable", httpStatus: response.status, message: "الرابط متاح · لم تُقارن hash" };
+          return;
+        }
+        if (!crypto.subtle) {
+          results[source.id] = { state: "reachable", httpStatus: response.status, message: "الرابط متاح · تعذر تشغيل مقارنة hash في المتصفح" };
+          return;
+        }
+        const bytes = await response.arrayBuffer();
+        const digest = await crypto.subtle.digest("SHA-256", bytes);
+        const currentHash = Array.from(new Uint8Array(digest), (byte) => byte.toString(16).padStart(2, "0")).join("");
+        const expectedHash = source.contentHash.replace(/^sha256:/, "");
+        const matches = currentHash === expectedHash;
+        results[source.id] = { state: matches ? "unchanged" : "changed", httpStatus: response.status, message: matches ? "unchanged · hash مطابق" : "SOURCE_CHANGED · hash مختلف، أعد تحليل المصدر" };
+      } catch {
+        results[source.id] = { state: "unavailable", message: "تعذر الفحص من المتصفح؛ قد يكون CORS أو المصدر غير متاح" };
+      } finally {
+        window.clearTimeout(timeoutId);
+      }
+    }));
+
+    setVerification(results);
+    setIsVerifying(false);
+  }
+
+  const verificationValues = Object.values(verification);
+  const reachableCount = verificationValues.filter((result) => result.state === "reachable" || result.state === "unchanged").length;
+  const changedCount = verificationValues.filter((result) => result.state === "changed").length;
+  const unavailableCount = verificationValues.filter((result) => result.state === "unavailable").length;
+  const restrictedCount = verificationValues.filter((result) => result.state === "restricted").length;
+
+  return <div className="page-wrap"><section className="page-heading"><div><div className="eyebrow-line"><Library size={15} /> سجل التحقق المحلي</div><h1>المصادر الرسمية</h1><p>Registry محلي يفصل الحالي والتاريخي والمستقبلي والوصول المقيد.</p></div><div className="source-heading-actions"><button className="secondary-button" onClick={verifySources} disabled={isVerifying}><ShieldCheck size={16} /> {isVerifying ? "جارٍ الفحص..." : "Verify Sources"}</button><div className="source-counter"><ShieldCheck size={18} /><strong>{sourceRegistry.length}</strong><span>سجل مصدر</span></div></div></section><div className="source-principles"><div><ShieldCheck size={21} /><div><strong>Tier 1 أولًا</strong><p>Taksi Helsinki للسياسات التشغيلية، ثم Kela وTraficom.</p></div></div><div><FileText size={21} /><div><strong>التاريخ والصفحة</strong><p>كل Evidence يذكر الإصدار أو الصفحة عند توفرها.</p></div></div><div><LockKeyhole size={21} /><div><strong>لا نتجاوز الحماية</strong><p>المواد الخاصة تبقى ACCESS_RESTRICTED.</p></div></div></div><div className="source-controls"><div className="search-box"><Search size={18} /><input value={query} onChange={(event) => setQuery(event.target.value)} placeholder="ابحث عن AD Kuljettaja أو Kela أو Cabman..." /><kbd>⌘ K</kbd></div><div className="source-filter-row">{([["all", "الكل"], ["current", "Current"], ["historical", "Historical"], ["future", "Future"], ["restricted", "وصول مقيد"]] as const).map(([value, label]) => <button key={value} className={statusFilter === value ? "active" : ""} onClick={() => setStatusFilter(value)}>{label}</button>)}</div></div>{verificationValues.length > 0 && <div className="source-verification-summary" aria-live="polite"><strong>نتيجة الفحص الحالي</strong><span>{reachableCount} رابط متاح أو hash مطابق</span><span>{changedCount} SOURCE_CHANGED</span><span>{unavailableCount} غير متاح أو محجوب</span><span>{restrictedCount} وصول مقيد دون طلب المحتوى</span><small>الفحص يستخدم HEAD للمصادر بلا baseline، وGET/ SHA-256 فقط عندما يوجد contentHash مسجل. لا يتم تحديث المحتوى تلقائيًا.</small></div>}<div className="sources-list">{filteredSources.map((source, index) => { const check = verification[source.id]; return <article className="source-card" key={source.id}><div className={`source-number ${["amber", "blue", "teal", "violet", "rose"][index % 5]}`}>{String(index + 1).padStart(2, "0")}</div><div className="source-card-body"><div className="source-title-row"><div><span>{source.publisher}</span><h3>{source.title}</h3></div><SourceStatusBadge status={source.status} /></div><div className="source-card-meta"><SourceBadge>{source.documentType}</SourceBadge><span><Clock3 size={13} /> نُشر/رُفع: {source.publicationDate}</span>{source.pages && <span><FileText size={13} /> {source.pages} صفحة</span>}</div>{check && <div className={`source-check-result check-${check.state}`}><span className="status-dot" /><span>{check.message}</span>{check.httpStatus && <small>HTTP {check.httpStatus}</small>}</div>}<div className="source-topics">{source.topics.map((topic) => <span key={topic}>{topic}</span>)}</div>{source.notes && <p className="source-note-text">{source.notes}</p>}<div className="source-record-footer"><span>Last verified: {source.lastVerified} · Used in {knowledgeLessons.filter((lesson) => lesson.sourceIds.includes(source.id)).length} lessons</span><a href={source.url} target="_blank" rel="noreferrer">فتح المصدر الأصلي <ArrowLeft size={14} /></a></div></div></article>; })}</div><div className="sources-disclaimer"><div className="note-icon"><Info size={18} /></div><p><strong>قاعدة عدم الهلوسة:</strong> ملفات Autocab ومواد Materiaalisalkku وإشعارات السائق لم تكن متاحة للقراءة العامة عند التحقق، لذلك تظهر كـ ACCESS_RESTRICTED. أما Mitax وSemel فتم تسجيلها لكن لم تُستخدم لإثبات أزرار غير مقروءة. أي SOURCE_CHANGED يحتاج إعادة تحليل بشرية قبل تحديث Evidence؛ لا يتم تجاوز تسجيل الدخول أو تعديل قاعدة المعرفة تلقائيًا.</p></div></div>;
 }
 
 function Dashboard({ studyProgress, onStartQuiz, onNavigate, onOpenModule }: { studyProgress: StudyProgress; onStartQuiz: () => void; onNavigate: (key: NavKey) => void; onOpenModule: (id: string) => void }) {
@@ -578,14 +723,14 @@ function TrainingPath({ selectedModule, onSelectModule, onStartQuiz }: { selecte
   const detail = moduleDetails[selectedModule as keyof typeof moduleDetails];
   const selected = modules.find((module) => module.id === selectedModule) ?? modules[0];
   const Icon = selected.icon;
-  return <div className="page-wrap"><section className="page-heading"><div><div className="eyebrow-line"><BookOpenCheck size={15} /> المنهج الموثق</div><h1>مسار التدريب</h1><p>محتوى عملي، مترجم، ومربوط بالمصدر الأصلي لكل موضوع.</p></div><button className="secondary-button" onClick={onStartQuiz}><Brain size={16} /> اختبر نفسك</button></section><div className="path-layout"><aside className="path-nav"><div className="path-nav-head"><span>المنهج الكامل</span><small>4 وحدات</small></div>{modules.map((module) => { const ModuleIcon = module.icon; return <button key={module.id} onClick={() => onSelectModule(module.id)} className={`path-nav-item ${selectedModule === module.id ? "selected" : ""}`}><div className={`module-icon small ${module.color}`}><ModuleIcon size={16} /></div><div><strong>{module.id} · {module.title}</strong><span>{module.progress === 0 ? "لم تبدأ" : `${module.progress}% مكتمل`}</span></div><ChevronLeft size={15} /></button>; })}<div className="path-total"><div className="circular-progress"><span>68%</span></div><div><strong>التقدم الكلي</strong><span>12 من 24 درسًا</span></div></div></aside><section className="lesson-panel"><div className={`lesson-banner ${selected.color}`}><div className="lesson-banner-copy"><span className="lesson-eyebrow">الوحدة {selected.id} · {selected.eyebrow}</span><h2>{selected.title}</h2><p>{selected.description}</p><SourceBadge>{selected.source}</SourceBadge></div><div className="lesson-visual"><Icon size={42} /><span>{selected.progress}%</span></div></div><div className="lesson-meta-row"><span><Clock3 size={15} /> {selected.duration}</span><span><BookOpen size={15} /> {selected.lessons} دروس</span><span><ShieldCheck size={15} /> مصدر لكل درس</span><button className="outline-button" onClick={onStartQuiz}><Play size={14} /> جلسة مراجعة</button></div><div className="lesson-list">{detail.map(([number, title, description], index) => <div className={`lesson-item ${index < Math.ceil(selected.progress / 25) ? "done" : ""}`} key={number}><div className="lesson-check">{index < Math.ceil(selected.progress / 25) ? <Check size={14} /> : <span>{number}</span>}</div><div className="lesson-item-copy"><div><strong>{title}</strong>{index < Math.ceil(selected.progress / 25) && <span className="completed-label">مكتمل</span>}</div><p>{description}</p></div><button className="lesson-open" onClick={() => setActiveLesson(activeLesson === number ? null : number)}>{activeLesson === number ? "إخفاء" : index < Math.ceil(selected.progress / 25) ? "مراجعة" : "فتح"} <ArrowLeft size={14} /></button>{activeLesson === number && <div className="lesson-preview"><strong>ملخص الدرس</strong><p>{description}</p><span><ShieldCheck size={13} /> شرح تعليمي مرتبط بالمحتوى الموثق</span></div>}</div>)}</div><div className="verified-callout"><div><Info size={18} /></div><p><strong>ملاحظة منهجية:</strong> تفاصيل نظام السائق الداخلية، مثل أزرار Autocab أو إجراءات الأعطال، لا تُعرض كحقائق إلا إذا كانت في دليل رسمي عام قابل للتحقق. المحتوى المدفوع غير متاح لنا.</p></div></section></div></div>;
+  return <div className="page-wrap"><section className="page-heading"><div><div className="eyebrow-line"><BookOpenCheck size={15} /> المنهج الموثق</div><h1>مسار التدريب</h1><p>محتوى عملي، مترجم، ومربوط بالمصدر الأصلي لكل موضوع.</p></div><button className="secondary-button" onClick={onStartQuiz}><Brain size={16} /> اختبر نفسك</button></section><div className="path-layout"><aside className="path-nav"><div className="path-nav-head"><span>المنهج الكامل</span><small>4 وحدات</small></div>{modules.map((module) => { const ModuleIcon = module.icon; return <button key={module.id} onClick={() => onSelectModule(module.id)} className={`path-nav-item ${selectedModule === module.id ? "selected" : ""}`}><div className={`module-icon small ${module.color}`}><ModuleIcon size={16} /></div><div><strong>{module.id} · {module.title}</strong><span>{module.progress === 0 ? "لم تبدأ" : `${module.progress}% مكتمل`}</span></div><ChevronLeft size={15} /></button>; })}<div className="path-total"><div className="circular-progress"><span>68%</span></div><div><strong>التقدم الكلي</strong><span>12 من 24 درسًا</span></div></div></aside><section className="lesson-panel"><div className={`lesson-banner ${selected.color}`}><div className="lesson-banner-copy"><span className="lesson-eyebrow">الوحدة {selected.id} · {selected.eyebrow}</span><h2>{selected.title}</h2><p>{selected.description}</p><SourceBadge>{selected.source}</SourceBadge></div><div className="lesson-visual"><Icon size={42} /><span>{selected.progress}%</span></div></div><div className="lesson-meta-row"><span><Clock3 size={15} /> {selected.duration}</span><span><BookOpen size={15} /> {selected.lessons} دروس</span><span><ShieldCheck size={15} /> مصدر لكل درس</span><button className="outline-button" onClick={onStartQuiz}><Play size={14} /> جلسة مراجعة</button></div><div className="lesson-list">{detail.map(([number, title, description], index) => <div className={`lesson-item ${index < Math.ceil(selected.progress / 25) ? "done" : ""}`} key={number}><div className="lesson-check">{index < Math.ceil(selected.progress / 25) ? <Check size={14} /> : <span>{number}</span>}</div><div className="lesson-item-copy"><div><strong>{title}</strong>{index < Math.ceil(selected.progress / 25) && <span className="completed-label">مكتمل</span>}</div><p>{description}</p></div><button className="lesson-open" onClick={() => setActiveLesson(activeLesson === number ? null : number)}>{activeLesson === number ? "إخفاء" : index < Math.ceil(selected.progress / 25) ? "مراجعة" : "فتح"} <ArrowLeft size={14} /></button>{activeLesson === number && <div className="lesson-preview"><strong>ملخص الدرس</strong><p>{description}</p><span><ShieldCheck size={13} /> شرح تعليمي مرتبط بالمحتوى الموثق</span><a href={moduleSourceUrls[selected.id]} target="_blank" rel="noreferrer">فتح المصدر الأصلي <ExternalLink size={12} /></a></div>}</div>)}</div><div className="verified-callout"><div><Info size={18} /></div><p><strong>ملاحظة منهجية:</strong> تفاصيل نظام السائق الداخلية، مثل أزرار Autocab أو إجراءات الأعطال، لا تُعرض كحقائق إلا إذا كانت في دليل رسمي عام قابل للتحقق. المحتوى المدفوع غير متاح لنا.</p></div></section></div></div>;
 }
 
 function QuizView({ started, completed, startQuiz, currentQuestion, quizIndex, selectedAnswer, answers, quizScore, onAnswer, onNext, onRestart, onBack }: { started: boolean; completed: boolean; startQuiz: () => void; currentQuestion: Question; quizIndex: number; selectedAnswer: number | null; answers: Record<number, number>; quizScore: number; onAnswer: (answer: number) => void; onNext: () => void; onRestart: () => void; onBack: () => void }) {
   if (!started) return <div className="page-wrap"><section className="quiz-intro"><div className="quiz-intro-icon"><Brain size={38} /></div><div className="eyebrow-line">بنك الأسئلة · تدريب أصلي</div><h1>اختبر جاهزيتك بهدوء</h1><p>جلسة قصيرة من {questions.length} أسئلة مبنية على معلومات قابلة للتحقق من Taksi Helsinki وTraficom وKela. هذه الأسئلة تدريبية وليست أسئلة الامتحان الحقيقي.</p><div className="quiz-feature-row"><span><FileCheck2 size={17} /> مصادر مرفقة</span><span><TimerReset size={17} /> 15 دقيقة</span><span><Target size={17} /> نتيجة فورية</span></div><button className="primary-button" onClick={startQuiz}><Play size={17} fill="currentColor" /> ابدأ الاختبار القصير</button><button className="back-link" onClick={onBack}><ArrowRightIcon /> العودة إلى لوحة التحكم</button></section></div>;
   const isLast = quizIndex === questions.length - 1;
   const hasAnswer = selectedAnswer !== null;
-  return <div className="page-wrap quiz-page"><div className="quiz-topline"><button className="back-link" onClick={onBack}><ChevronRightIcon /> إنهاء الجلسة</button><div className="quiz-progress-copy"><span>سؤال {quizIndex + 1} من {questions.length}</span><div className="quiz-progress-track"><span style={{ width: `${((quizIndex + 1) / questions.length) * 100}%` }} /></div></div><span className="score-pill"><Trophy size={14} /> {quizScore} صحيحة</span></div><div className="quiz-question-card"><div className="question-meta"><span className="category-pill">{currentQuestion.category}</span><SourceBadge>تدريبي</SourceBadge></div><h1 dir="ltr">{currentQuestion.finnish}</h1><p className="arabic-question">{currentQuestion.arabic}</p><div className="options-list">{currentQuestion.options.map((option, index) => { const isChosen = selectedAnswer === index; const isCorrect = hasAnswer && index === currentQuestion.answer; const isWrong = isChosen && index !== currentQuestion.answer; return <button key={option} className={`option ${isChosen ? "chosen" : ""} ${isCorrect ? "correct" : ""} ${isWrong ? "wrong" : ""}`} onClick={() => !hasAnswer && onAnswer(index)}><span className="option-letter">{String.fromCharCode(65 + index)}</span><span>{option}</span>{isCorrect && <Check size={18} />}{isWrong && <X size={18} />}</button>; })}</div>{hasAnswer && <div className={`answer-feedback ${selectedAnswer === currentQuestion.answer ? "positive" : "negative"}`}><div>{selectedAnswer === currentQuestion.answer ? <Check size={18} /> : <Info size={18} />}</div><p><strong>{selectedAnswer === currentQuestion.answer ? "إجابة صحيحة" : "راجع هذه النقطة"}</strong>{currentQuestion.explanation}<small>المصدر: {currentQuestion.source}</small></p></div>}<div className="question-actions"><span><LockKeyhole size={14} /> لا نحفظ بيانات شخصية</span>{hasAnswer && (completed ? <button className="secondary-button" onClick={onRestart}><Play size={14} /> إعادة الاختبار</button> : <button className="primary-button" onClick={onNext}>{isLast ? "عرض النتيجة" : "السؤال التالي"} <ArrowLeft size={16} /></button>)}</div></div>{isLast && hasAnswer && completed && <div className="quiz-result"><Trophy size={23} /><div><strong>أكملت جلسة المراجعة</strong><span>نتيجتك {quizScore} من {questions.length}. ارجع للمصادر إذا أخطأت في سؤال.</span></div><button className="text-button" onClick={onBack}>العودة للوحة <ArrowLeft size={14} /></button></div>}</div>;
+  return <div className="page-wrap quiz-page"><div className="quiz-topline"><button className="back-link" onClick={onBack}><ChevronRightIcon /> إنهاء الجلسة</button><div className="quiz-progress-copy"><span>سؤال {quizIndex + 1} من {questions.length}</span><div className="quiz-progress-track"><span style={{ width: `${((quizIndex + 1) / questions.length) * 100}%` }} /></div></div><span className="score-pill"><Trophy size={14} /> {quizScore} صحيحة</span></div><div className="quiz-question-card"><div className="question-meta"><span className="category-pill">{currentQuestion.category}</span><SourceBadge>تدريبي</SourceBadge></div><h1 dir="ltr">{currentQuestion.finnish}</h1><p className="arabic-question">{currentQuestion.arabic}</p><div className="options-list">{currentQuestion.options.map((option, index) => { const isChosen = selectedAnswer === index; const isCorrect = hasAnswer && index === currentQuestion.answer; const isWrong = isChosen && index !== currentQuestion.answer; return <button key={option} className={`option ${isChosen ? "chosen" : ""} ${isCorrect ? "correct" : ""} ${isWrong ? "wrong" : ""}`} onClick={() => !hasAnswer && onAnswer(index)}><span className="option-letter">{String.fromCharCode(65 + index)}</span><span>{option}</span>{isCorrect && <Check size={18} />}{isWrong && <X size={18} />}</button>; })}</div>{hasAnswer && <div className={`answer-feedback ${selectedAnswer === currentQuestion.answer ? "positive" : "negative"}`}><div>{selectedAnswer === currentQuestion.answer ? <Check size={18} /> : <Info size={18} />}</div><p><strong>{selectedAnswer === currentQuestion.answer ? "إجابة صحيحة" : "راجع هذه النقطة"}</strong>{currentQuestion.explanation}<small>المصدر: {currentQuestion.source}{currentQuestion.sourcePage ? ` · الصفحة ${currentQuestion.sourcePage}` : ""}{currentQuestion.evidenceId ? ` · Evidence ${currentQuestion.evidenceId}` : ""}</small></p></div>}<div className="question-actions"><span><LockKeyhole size={14} /> لا نحفظ بيانات شخصية</span>{hasAnswer && (completed ? <button className="secondary-button" onClick={onRestart}><Play size={14} /> إعادة الاختبار</button> : <button className="primary-button" onClick={onNext}>{isLast ? "عرض النتيجة" : "السؤال التالي"} <ArrowLeft size={16} /></button>)}</div></div>{isLast && hasAnswer && completed && <div className="quiz-result"><Trophy size={23} /><div><strong>أكملت جلسة المراجعة</strong><span>نتيجتك {quizScore} من {questions.length}. ارجع للمصادر إذا أخطأت في سؤال.</span></div><button className="text-button" onClick={onBack}>العودة للوحة <ArrowLeft size={14} /></button></div>}</div>;
 }
 
 function Glossary({ search, onSearch, terms }: { search: string; onSearch: (value: string) => void; terms: string[][] }) {
@@ -597,10 +742,61 @@ function Glossary({ search, onSearch, terms }: { search: string; onSearch: (valu
     Kyyti: "Kyyti alkaa, kun asiakas on autossa. · تبدأ الرحلة عندما يكون العميل داخل السيارة.",
     Tilaus: "Vastaanota tilaus ja tarkista tiedot. · استقبل الطلب وتحقق من البيانات.",
   };
-  return <div className="page-wrap"><section className="page-heading"><div><div className="eyebrow-line"><Languages size={15} /> فنلندي عملي</div><h1>قاموس السائق</h1><p>المصطلح كما ستراه في المادة، ثم معناه بالعربية وشرحه العملي.</p></div><div className="glossary-count">{terms.length} مصطلحًا</div></section><div className="search-box"><Search size={18} /><input value={search} onChange={(event) => onSearch(event.target.value)} placeholder="ابحث بالفنلندية أو العربية..." /><kbd>⌘ K</kbd></div><div className="glossary-grid">{terms.map(([term, meaning, explanation], index) => { const isExpanded = expandedTerm === term; return <article className={`glossary-card ${isExpanded ? "expanded" : ""}`} key={term}><span className="glossary-index">{String(index + 1).padStart(2, "0")}</span><div className="glossary-term"><strong dir="ltr">{term}</strong><span>{meaning}</span></div><p>{explanation}</p>{isExpanded && <div className="glossary-example"><strong>مثال عملي</strong><span>{examples[term] ?? `استخدم مصطلح ${term} عند مراجعة تفاصيل الرحلة مع العميل.`}</span></div>}<div className="glossary-footer"><SourceBadge>شرح تعليمي</SourceBadge><button onClick={() => setExpandedTerm(isExpanded ? null : term)}><BookOpen size={14} /> {isExpanded ? "إخفاء المثال" : "مثال عملي"}</button></div></article>; })}</div></div>;
+  return <div className="page-wrap"><section className="page-heading"><div><div className="eyebrow-line"><Languages size={15} /> فنلندي عملي</div><h1>قاموس السائق</h1><p>المصطلح كما ستراه في المادة، ثم معناه بالعربية وشرحه العملي.</p></div><div className="glossary-count">{terms.length} مصطلحًا</div></section><div className="search-box"><Search size={18} /><input value={search} onChange={(event) => onSearch(event.target.value)} placeholder="ابحث بالفنلندية أو العربية..." /><kbd>⌘ K</kbd></div><div className="glossary-grid">{terms.map(([term, meaning, explanation, sourceLabel], index) => { const isExpanded = expandedTerm === term; return <article className={`glossary-card ${isExpanded ? "expanded" : ""}`} key={term}><span className="glossary-index">{String(index + 1).padStart(2, "0")}</span><div className="glossary-term"><strong dir="ltr">{term}</strong><span>{meaning}</span></div><p>{explanation}</p>{isExpanded && <div className="glossary-example"><strong>مثال موثق</strong><span>{sourceLabel ? `${examples[term] ?? knowledgeGlossary.find((entry) => entry.term === term)?.example ?? `راجع ${term} في المصدر.`}` : (examples[term] ?? `استخدم مصطلح ${term} عند مراجعة تفاصيل الرحلة مع العميل.`)}</span>{sourceLabel && <small>المصدر: {sourceLabel}</small>}</div>}<div className="glossary-footer"><SourceBadge>{sourceLabel ? "مصدر رسمي" : "شرح تعليمي"}</SourceBadge><button onClick={() => setExpandedTerm(isExpanded ? null : term)}><BookOpen size={14} /> {isExpanded ? "إخفاء المثال" : "مثال عملي"}</button></div></article>; })}</div></div>;
+}
+
+const sourceStatusLabels: Record<SourceStatus, string> = {
+  official_current: "رسمي · حالي",
+  official_historical: "رسمي · تاريخي",
+  official_future: "رسمي · مستقبلي",
+  official_notice: "إشعار رسمي",
+  access_restricted: "وصول مقيد",
+  not_verified: "NOT_VERIFIED",
+};
+
+function SourceStatusBadge({ status }: { status: SourceStatus }) {
+  return <span className={`source-status-badge status-${status}`}><span className="status-dot" />{sourceStatusLabels[status]}</span>;
+}
+
+function KnowledgeBaseView() {
+  const [query, setQuery] = useState("");
+  const [moduleFilter, setModuleFilter] = useState("all");
+  const [expandedLesson, setExpandedLesson] = useState("kb-ad-003");
+  const normalizedQuery = query.trim().toLowerCase();
+  const filteredLessons = useMemo(() => knowledgeLessons.filter((lesson) => {
+    const searchable = [lesson.title, lesson.summary, lesson.commonMistake, ...lesson.whatYouNeedToKnow, ...lesson.terminology].join(" ").toLowerCase();
+    return (moduleFilter === "all" || lesson.moduleId === moduleFilter) && (!normalizedQuery || searchable.includes(normalizedQuery));
+  }), [moduleFilter, normalizedQuery]);
+
+  return <div className="page-wrap">
+    <section className="page-heading knowledge-heading"><div><div className="eyebrow-line"><FileCheck2 size={15} /> مصدر ← دليل ← تدريب</div><h1>قاعدة المعرفة</h1><p>محتوى محلي منظم من المصادر الرسمية، مع Evidence واضح وحدود معلنة للمادة غير المتاحة.</p></div><div className="audit-stamp"><span>آخر تحقق</span><strong>{knowledgeAudit.lastVerified}</strong></div></section>
+    <section className="kb-audit-grid">{[
+      ["مصادر رسمية", knowledgeAudit.officialSourcesDiscovered, "اكتُشفت وسُجلت"],
+      ["ملفات PDF مقروءة", `${knowledgeAudit.officialPdfsParsed}/${knowledgeAudit.officialPdfsDiscovered}`, "المقروء كاملًا"],
+      ["Evidence claims", knowledgeAudit.knowledgeClaims, "ادعاء مرتبط بمصدر"],
+      ["دروس منظمة", knowledgeAudit.lessonsGenerated, `${knowledgeAudit.practicalScenarios} حالات عملية`],
+      ["أسئلة مرتبطة", knowledgeAudit.quizQuestions, "training · ليست امتحانًا"],
+      ["غير متحقق", knowledgeAudit.unverifiedClaims, `${knowledgeAudit.notVerifiedTopics} محاور محجوبة`],
+    ].map(([label, value, note]) => <div className="kb-audit-card" key={label}><span>{label}</span><strong>{value}</strong><small>{note}</small></div>)}</section>
+    <div className="knowledge-toolbar"><div className="search-box"><Search size={18} /><input value={query} onChange={(event) => setQuery(event.target.value)} placeholder="ابحث في الدروس والمصطلحات وAutocab وKela..." /><kbd>⌘ K</kbd></div><select value={moduleFilter} onChange={(event) => setModuleFilter(event.target.value)} aria-label="تصفية الوحدات"><option value="all">كل الوحدات ({knowledgeModules.length})</option>{knowledgeModules.map((module) => <option key={module.id} value={module.id}>{module.number} · {module.title}</option>)}</select></div>
+    <div className="knowledge-layout"><aside className="knowledge-module-list"><div className="path-nav-head"><span>تغطية المنهج</span><small>{knowledgeModules.length} محورًا</small></div>{knowledgeModules.map((module) => <button key={module.id} className={`knowledge-module-row ${moduleFilter === module.id ? "selected" : ""}`} onClick={() => setModuleFilter(moduleFilter === module.id ? "all" : module.id)}><span className="module-number">{module.number}</span><span><strong>{module.title}</strong><small>{module.lessonIds.length} {module.lessonIds.length === 1 ? "درس" : "دروس"}</small></span><SourceStatusBadge status={module.status} /></button>)}</aside><section className="knowledge-results"><div className="knowledge-results-head"><div><h2>الدروس والأدلة</h2><p>{filteredLessons.length} نتيجة · افتح الدرس لرؤية الإجراء والمصدر والصفحة.</p></div><span className="source-badge"><ShieldCheck size={13} /> لا معلومات بلا Evidence</span></div>{filteredLessons.length === 0 && <div className="empty-state"><Search size={22} /><strong>لا توجد نتيجة موثقة لهذا البحث</strong><span>جرّب مصطلحًا آخر أو اختر كل الوحدات.</span></div>}{filteredLessons.map((lesson) => { const isExpanded = expandedLesson === lesson.id; return <article className={`knowledge-lesson-card ${isExpanded ? "expanded" : ""}`} key={lesson.id}><div className="knowledge-lesson-top"><div><div className="knowledge-lesson-label"><span>الوحدة {knowledgeModules.find((module) => module.id === lesson.moduleId)?.number ?? "—"}</span><SourceStatusBadge status={lesson.status} /></div><h3>{lesson.title}</h3><p>{lesson.summary}</p></div><button className="lesson-open" onClick={() => setExpandedLesson(isExpanded ? "" : lesson.id)}>{isExpanded ? "إخفاء التفاصيل" : "فتح الدليل"} <ArrowLeft size={14} /></button></div>{isExpanded && <div className="knowledge-lesson-detail"><div className="detail-columns"><div><h4>ما تحتاج إلى معرفته</h4><ul>{lesson.whatYouNeedToKnow.map((item) => <li key={item}>{item}</li>)}</ul></div><div><h4>الإجراء المنشور</h4><ol>{lesson.officialProcedure.map((item) => <li key={item}>{item}</li>)}</ol></div><div><h4>مصطلحات</h4><div className="term-chips">{lesson.terminology.map((term) => <span key={term}>{term}</span>)}</div><p className="mistake-note"><strong>خطأ شائع:</strong> {lesson.commonMistake}</p></div></div>{lesson.scenario && <div className="scenario-card"><div className="scenario-icon"><Target size={17} /></div><div><span>حالة عملية مشتقة من الدليل</span><h4>{lesson.scenario.title}</h4><p><strong>ماذا حدث؟</strong> {lesson.scenario.happened}</p><p><strong>لماذا؟</strong> {lesson.scenario.why}</p><p><strong>ما يثبته المصدر:</strong> {lesson.scenario.officialGuidance}</p><p><strong>الخطوة التالية:</strong> {lesson.scenario.nextStep}</p></div></div>}<div className="evidence-panel"><div className="evidence-panel-head"><div><h4>Evidence panel</h4><p>كل claim هنا مرتبط بمصدر وصفحة.</p></div><span>{lesson.evidenceIds.length} أدلة</span></div>{lesson.evidenceIds.length === 0 && <p className="not-verified-note">NOT_VERIFIED — لا توجد claims تشغيلية مثبتة لهذا الدرس.</p>}{lesson.evidenceIds.map((evidenceId) => { const evidence = evidenceFor(evidenceId); if (!evidence) return null; const source = sourceFor(evidence.sourceId); return <div className="evidence-row" key={evidence.id}><div className="evidence-page">{evidence.page}<small>صفحة</small></div><div><strong>{evidence.claim}</strong><span>{evidence.section} · {evidence.topic}</span></div>{source && <a href={source.url} target="_blank" rel="noreferrer" aria-label={`فتح ${source.title}`}><ExternalLink size={14} /></a>}</div>; })}</div><div className="lesson-source-row">{lesson.sourceIds.map((sourceId) => { const source = sourceFor(sourceId); if (!source) return null; return <a key={source.id} href={source.url} target="_blank" rel="noreferrer"><ShieldCheck size={13} /> {source.title} <ExternalLink size={12} /></a>; })}<span>آخر تحقق: {lesson.lastVerified}</span></div></div>}</article>; })}</section></div>
+    <section className="mock-exams"><div className="section-heading compact"><div><h2>Mock exams</h2><p>تقسيم الأسئلة حسب المحور، وكلها تدريبية مرتبطة بالمصدر.</p></div><SourceBadge>official_exam_question = false</SourceBadge></div><div className="mock-exam-grid">{mockExams.map((exam) => <article key={exam.id}><div className="mock-exam-number"><Trophy size={15} /></div><div><strong>{exam.title}</strong><p>{exam.description}</p><span>{exam.questionIds.length} سؤال مرتبط</span></div></article>)}</div></section>
+  </div>;
 }
 
 function Sources() {
+  const [statusFilter, setStatusFilter] = useState<"all" | "current" | "historical" | "future" | "restricted">("all");
+  const [query, setQuery] = useState("");
+  const normalizedQuery = query.trim().toLowerCase();
+  const filteredSources = useMemo(() => sourceRegistry.filter((source) => {
+    const statusMatch = statusFilter === "all" || (statusFilter === "current" && source.status === "official_current") || (statusFilter === "historical" && source.status === "official_historical") || (statusFilter === "future" && source.status === "official_future") || (statusFilter === "restricted" && source.status === "access_restricted");
+    const text = [source.title, source.publisher, source.documentType, source.topics.join(" "), source.notes ?? ""].join(" ").toLowerCase();
+    return statusMatch && (!normalizedQuery || text.includes(normalizedQuery));
+  }), [normalizedQuery, statusFilter]);
+  return <div className="page-wrap"><section className="page-heading"><div><div className="eyebrow-line"><Library size={15} /> سجل التحقق المحلي</div><h1>المصادر الرسمية</h1><p>Registry محلي يفصل الحالي والتاريخي والمستقبلي والوصول المقيد.</p></div><div className="source-counter"><ShieldCheck size={18} /><strong>{sourceRegistry.length}</strong><span>سجل مصدر</span></div></section><div className="source-principles"><div><ShieldCheck size={21} /><div><strong>Tier 1 أولًا</strong><p>Taksi Helsinki للسياسات التشغيلية، ثم Kela وTraficom.</p></div></div><div><FileText size={21} /><div><strong>التاريخ والصفحة</strong><p>كل Evidence يذكر الإصدار أو الصفحة عند توفرها.</p></div></div><div><LockKeyhole size={21} /><div><strong>لا نتجاوز الحماية</strong><p>المواد الخاصة تبقى ACCESS_RESTRICTED.</p></div></div></div><div className="source-controls"><div className="search-box"><Search size={18} /><input value={query} onChange={(event) => setQuery(event.target.value)} placeholder="ابحث عن AD Kuljettaja أو Kela أو Cabman..." /><kbd>⌘ K</kbd></div><div className="source-filter-row">{([["all", "الكل"], ["current", "Current"], ["historical", "Historical"], ["future", "Future"], ["restricted", "وصول مقيد"]] as const).map(([value, label]) => <button key={value} className={statusFilter === value ? "active" : ""} onClick={() => setStatusFilter(value)}>{label}</button>)}</div></div><div className="sources-list">{filteredSources.map((source, index) => <article className="source-card" key={source.id}><div className={`source-number ${["amber", "blue", "teal", "violet", "rose"][index % 5]}`}>{String(index + 1).padStart(2, "0")}</div><div className="source-card-body"><div className="source-title-row"><div><span>{source.publisher}</span><h3>{source.title}</h3></div><SourceStatusBadge status={source.status} /></div><div className="source-card-meta"><SourceBadge>{source.documentType}</SourceBadge><span><Clock3 size={13} /> نُشر/رُفع: {source.publicationDate}</span>{source.pages && <span><FileText size={13} /> {source.pages} صفحة</span>}</div><div className="source-topics">{source.topics.map((topic) => <span key={topic}>{topic}</span>)}</div>{source.notes && <p className="source-note-text">{source.notes}</p>}<div className="source-record-footer"><span>Last verified: {source.lastVerified} · Used in {knowledgeLessons.filter((lesson) => lesson.sourceIds.includes(source.id)).length} lessons</span><a href={source.url} target="_blank" rel="noreferrer">فتح المصدر الأصلي <ArrowLeft size={14} /></a></div></div></article>)}</div><div className="sources-disclaimer"><div className="note-icon"><Info size={18} /></div><p><strong>قاعدة عدم الهلوسة:</strong> ملفات Autocab ومواد Materiaalisalkku وإشعارات السائق لم تكن متاحة للقراءة العامة عند التحقق، لذلك تظهر كـ ACCESS_RESTRICTED. أما Mitax وSemel فتم تسجيلها لكن لم تُستخدم لإثبات أزرار غير مقروءة. راجع <code>docs/OFFICIAL_SOURCES.md</code> و<code>docs/EVIDENCE_MAP.md</code> للتقرير القابل للمراجعة.</p></div></div>;
+}
+
+function SourcesLegacy() {
   return <div className="page-wrap"><section className="page-heading"><div><div className="eyebrow-line"><Library size={15} /> سجل التحقق</div><h1>المصادر الرسمية</h1><p>لا تعتمد على معلومة مهمة قبل معرفة الجهة التي نشرتها وتاريخ فحصها.</p></div><div className="source-counter"><ShieldCheck size={18} /><strong>{sources.length}</strong><span>مصادر موثقة</span></div></section><div className="source-principles"><div><ShieldCheck size={21} /><div><strong>ثلاثة أوسمة للمحتوى</strong><p><b className="official-text">رسمي</b> · <b className="explain-text">شرح تعليمي</b> · <b className="practice-text">سؤال تدريبي</b></p></div></div><div><FileText size={21} /><div><strong>تاريخ الوصول واضح</strong><p>المعلومات المتغيرة تحتاج مراجعة دورية.</p></div></div><div><LockKeyhole size={21} /><div><strong>لا محتوى مدفوع</strong><p>لم ندّعِ قراءة منصة أو دليل خاص.</p></div></div></div><div className="sources-list">{sources.map((source, index) => <article className="source-card" key={source.id}><div className={`source-number ${source.accent}`}>{String(index + 1).padStart(2, "0")}</div><div className="source-card-body"><div className="source-title-row"><div><span>{source.publisher}</span><h3>{source.name}</h3></div><ExternalLink size={18} className="source-external" /></div><div className="source-card-meta"><SourceBadge>{source.type}</SourceBadge><span><Clock3 size={13} /> {source.date}</span></div><a href={source.url} target="_blank" rel="noreferrer">فتح المصدر الأصلي <ArrowLeft size={14} /></a></div></article>)}</div><div className="sources-disclaimer"><div className="note-icon"><Info size={18} /></div><p><strong>حدود التحقق:</strong> لم نعثر في المصادر العامة المفحوصة على دليل رسمي منشور يشرح خطوات Autocab الداخلية أو خرائط انتظار المطار والموانئ بالتفصيل. لذلك تظهر هذه الموضوعات كـ «تحتاج مادة رسمية» بدلًا من ملئها بالتخمين.</p></div></div>;
 }
 

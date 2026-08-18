@@ -32,17 +32,21 @@ No API keys are required for the current frontend experience. The public-source 
 The frontend lives in `artifacts/mockup-sandbox/src/App.tsx` and currently includes:
 
 - Dashboard with progress metrics and a Taksi Helsinki learning path
-- Four training modules with source badges and verification boundaries
-- Original five-question practice session with immediate feedback
-- Finnish-to-Arabic driver glossary with search
-- Official source library with access dates and direct links
+- Four existing guided training modules with source badges and verification boundaries
+- A local knowledge base covering 20 requested topic modules, 24 structured lessons, 38 evidence claims, practical scenarios, and mock-exam groupings
+- A current public AD Kuljettaja SOTE module sourced from the 20-page 02.02.2026 guide, plus historical Kela app evidence clearly labelled historical
+- Original practice questions with immediate feedback; the new auditable question set carries `evidenceId`, source page, `trainingQuestion: true`, and `officialExamQuestion: false`
+- Finnish-to-Arabic glossary enriched with terms extracted from the AD and quality documents
+- Official source registry with Current / Historical / Future / Access restricted filters, direct links, and a browser-side `Verify Sources` reachability check
+- Evidence panel showing the source, section, page, claim, and last verification date for each structured lesson
+- `Knowledge Base Audit` view and reports in `docs/KNOWLEDGE_BASE_AUDIT.md`, `docs/OFFICIAL_SOURCES.md`, and `docs/EVIDENCE_MAP.md`
 - Responsive mobile navigation and a light/dark presentation toggle
 
-The current experience is a static study prototype. Progress, accounts, saved attempts, and content management are not persisted yet.
+The current experience is a static study application. Accounts, server-side progress, automatic remote hashing, and private source ingestion are not implemented; restricted and unverified topics remain explicitly marked.
 
 ## Source policy
 
-The platform uses public pages from Taksi Helsinki, Traficom, and Kela. It does not claim access to paid training, Extranet material, private Autocab procedures, or unpublished airport/port operating instructions. Training questions are clearly labelled as original practice questions, not real exam questions.
+The platform uses public pages and readable PDFs from Taksi Helsinki, Traficom, and Kela. It does not claim access to paid training, Extranet material, private Autocab procedures, or unpublished airport/port operating instructions. Materiaalisalkku and driver notices are recorded as `ACCESS_RESTRICTED`; meter PDFs with title-only extraction are not used for button-level claims. Training questions are clearly labelled as original practice questions, not real exam questions.
 
 ## Gotchas
 
