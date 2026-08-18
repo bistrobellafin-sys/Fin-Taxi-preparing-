@@ -134,8 +134,8 @@ const modules = [
     eyebrow: "جاهزية الاختبار",
     title: "اللغة والاختبار",
     description: "مصطلحات العمل، أسئلة أصلية للتدريب، والفرق بين اختبار الشركة واختبار Traficom.",
-    duration: "60 دقيقة",
-    lessons: 9,
+    duration: "90 دقيقة",
+    lessons: 15,
     progress: 48,
     icon: Brain,
     color: "blue",
@@ -160,8 +160,8 @@ const modules = [
     eyebrow: "العمل الميداني",
     title: "Helsinki في يوم السائق",
     description: "ملاحظات للمراجعة حول الأماكن والرحلات، مع تنبيه واضح عندما لا توجد قائمة تشغيلية عامة.",
-    duration: "28 دقيقة",
-    lessons: 4,
+    duration: "45 دقيقة",
+    lessons: 7,
     progress: 0,
     icon: Map,
     color: "violet",
@@ -306,6 +306,60 @@ const questions: Question[] = [
     explanation: "تربط Traficom طلب رخصة التاكسي بمتطلبات اللياقة للقيادة من المجموعة 2؛ التفاصيل الطبية يجب أخذها من الجهة الصحية المختصة.",
     source: "Traficom · Apply for a taxi driving licence",
   },
+  {
+    category: "Traficom · صلاحية الاختبار",
+    finnish: "Kuinka kauan hyväksytty taksinkuljettajan koe on voimassa?",
+    arabic: "إلى متى يبقى اختبار سائق التاكسي المقبول صالحًا؟",
+    options: ["حتى إشعار آخر", "30 يومًا", "6 أشهر فقط", "سنتين فقط"],
+    answer: 0,
+    explanation: "تذكر Traficom أن اختبار سائق التاكسي المقبول صالح حتى إشعار آخر، مع ضرورة متابعة التغييرات التشريعية الجديدة.",
+    source: "Traficom · Apply for a taxi driving licence",
+  },
+  {
+    category: "Traficom · شروط الرخصة",
+    finnish: "Voidaanko taksinkuljettajan ajolupa myöntää ajokiellossa olevalle?",
+    arabic: "هل يمكن إصدار رخصة قيادة التاكسي لمن يخضع لمنع قيادة؟",
+    options: ["نعم دائمًا", "لا، يجب ألا يكون ممنوعًا من القيادة", "فقط في عطلة نهاية الأسبوع", "لا علاقة لذلك"],
+    answer: 1,
+    explanation: "تشترط Traficom ألا يكون مقدم الطلب خاضعًا لمنع قيادة ضمن شروط إصدار الرخصة.",
+    source: "Traficom · Apply for a taxi driving licence",
+  },
+  {
+    category: "تغيير تشريعي قادم",
+    finnish: "Milloin taksamittarit tulevat pakollisiksi kaikissa takseissa?",
+    arabic: "متى تصبح عدادات التاكسي إلزامية في جميع سيارات التاكسي؟",
+    options: ["1 سبتمبر 2026", "1 نوفمبر 2026", "1 فبراير 2027", "1 يوليو 2027"],
+    answer: 2,
+    explanation: "تحدد صفحة Traficom تاريخ 1 فبراير 2027 لبدء إلزامية عدادات التاكسي، لذلك لا نعرضها كقاعدة سارية قبل تاريخها.",
+    source: "Traficom · Changes to taxi transport regulation",
+  },
+  {
+    category: "تغيير تشريعي قادم",
+    finnish: "Milloin taksikilvet tulevat pakollisiksi kaikissa taksiliikenteen ajoneuvoissa?",
+    arabic: "متى تصبح لوحات التاكسي إلزامية في المركبات المستخدمة لنقل التاكسي؟",
+    options: ["1 سبتمبر 2026", "1 يناير 2027", "1 فبراير 2027", "1 يوليو 2027"],
+    answer: 3,
+    explanation: "تذكر Traficom أن لوحات التاكسي تصبح إلزامية في 1 يوليو 2027، مع بدء إصدارها من 1 يناير 2027.",
+    source: "Traficom · Changes to taxi transport regulation",
+  },
+  {
+    category: "Taksi Helsinki · الجودة",
+    finnish: "Mitä Taksi Helsinki kertoo seuraavansa jatkuvasti?",
+    arabic: "ما الذي تقول Taksi Helsinki إنها تراقبه باستمرار؟",
+    options: ["رضا العملاء", "أسعار الوقود فقط", "عدد السيارات في المطار فقط", "نتائج امتحان Traficom"],
+    answer: 0,
+    explanation: "تقول الصفحة الرسمية إن Taksi Helsinki تراقب رضا العملاء باستمرار وتطور خدماتها وفق احتياجاتهم وتوقعاتهم.",
+    source: "Taksi Helsinki · Front page",
+  },
+  {
+    category: "Taksi Helsinki · التصاريح",
+    finnish: "Mitä Taksi Helsinki kertoo välitysjärjestelmässään toimivista kuljettajista?",
+    arabic: "ما الذي تقوله Taksi Helsinki عن السائقين العاملين في نظام الإرسال لديها؟",
+    options: ["لديهم تصريح سائق تاكسي ساري", "لا يحتاجون إلى تصريح", "يعملون بتصريح مؤقت دائمًا", "تتحقق الشركة من رخصة B فقط"],
+    answer: 0,
+    explanation: "تذكر الصفحة الرسمية أن كل سائق يعمل في نظام الإرسال لديها يملك تصريح سائق تاكسي ساريًا.",
+    source: "Taksi Helsinki · Front page",
+  },
 ];
 
 const glossary = [
@@ -325,6 +379,10 @@ const glossary = [
   ["Kiinteä hinta", "سعر ثابت", "مصطلح يجب فهمه من تعليمات الشركة الحالية؛ لا نضيف إجراءً غير منشور."],
   ["Erityisryhmät", "المجموعات الخاصة", "عملاء يحتاجون مهارات مساعدة وتجهيزات خاصة."],
   ["Omavastuu", "المبلغ الذي يدفعه العميل", "مصطلح يظهر في سياق تعويضات Kela؛ تحقّق من القاعدة الحالية."],
+  ["Lääkärinlausunto", "تقرير طبي", "وثيقة طبية قد تطلبها Traficom ضمن طلب رخصة قيادة التاكسي وفق الشروط والتواريخ المنشورة."],
+  ["Taksinkuljetuslupa", "رخصة نقل التاكسي", "ترخيص النقل الذي تميزه Taksi Helsinki عن تصريح السائق الفردي؛ لا تخلط بينهما."],
+  ["Asiakastyytyväisyys", "رضا العملاء", "مؤشر تقول Taksi Helsinki إنها تراقبه باستمرار لتطوير الخدمة."],
+  ["Sote-taksi", "تاكسي الخدمات الاجتماعية والصحية", "نوع خدمة تذكره Taksi Helsinki في مناطق محددة على صفحتها العامة؛ تحقق من المناطق الحالية."],
 ];
 
 const moduleDetails = {
@@ -345,6 +403,12 @@ const moduleDetails = {
     ["07", "مدة صلاحية الرخصة", "تذكر Traficom أن رخصة قيادة التاكسي صالحة خمس سنوات، أو سنتين لمن يبلغ 68 عامًا أو أكثر."],
     ["08", "التقرير الطبي", "يجب أن يكون التقرير الطبي المطلوب عند تقديم الطلب حديثًا، وتذكر Traficom ألا يتجاوز عمره 6 أشهر، مع استثناءات محددة في الصفحة الرسمية."],
     ["09", "نزاهة الاختبار", "توضح Traficom أن الغش في اختبار سائق التاكسي قد يؤدي إلى منع المرشح من دخول الاختبار لمدة 6 أشهر."],
+    ["10", "صلاحية الاختبار المقبول", "تذكر Traficom أن اختبار سائق التاكسي المقبول صالح حتى إشعار آخر، مع ضرورة مراجعة أي تغيير رسمي لاحقًا."],
+    ["11", "منع القيادة", "من شروط إصدار رخصة قيادة التاكسي ألا يكون مقدم الطلب ممنوعًا من القيادة."],
+    ["12", "معلومة مستقبلية: عداد التاكسي", "تقول Traficom إن عدادات التاكسي تصبح إلزامية في جميع سيارات التاكسي من 1 فبراير 2027. هذه ليست قاعدة حالية قبل تاريخها."],
+    ["13", "معلومة مستقبلية: لوحات التاكسي", "تقول Traficom إن لوحات التاكسي تصبح إلزامية في 1 يوليو 2027، مع بدء إصدارها من 1 يناير 2027."],
+    ["14", "معلومة مستقبلية: شفافية الأجرة", "من 1 سبتمبر 2026، توضح Traficom أن السائق يجب أن يقدم معلومات الأجرة قبل الرحلة إذا طلب العميل ذلك، وفق الشروط المنشورة."],
+    ["15", "حدود الاختبار", "هذه المراجعة لا تستبدل اختبار Traficom ولا تمثل أسئلته الحقيقية؛ هي أسئلة أصلية مبنية على معلومات عامة منشورة."],
   ],
   "03": [
     ["01", "مركز الطلب الإقليمي", "رحلة Kela تُطلب من مركز إقليمي. في Uusimaa يظهر رقم Taksi Helsinki الرسمي: 0800 414 600، مع رقم سويدي منفصل."],
@@ -356,8 +420,12 @@ const moduleDetails = {
   ],
   "04": [
     ["01", "المعرفة المحلية", "تدرج Taksi Helsinki معرفة pääkaupunkiseutu ضمن التدريب الإلكتروني، كما يذكر التدريب العملي التعرف على الأماكن المهمة."],
-    ["02", "المطار والموانئ", "هذه المنصة لا تخترع مناطق انتظار أو مسارات تشغيلية؛ راجع تعليمات الشركة الحالية أو التدريب المدفوع عند توفرها."],
-    ["03", "المعلومة المؤكدة", "الخدمة الرسمية تقول إن الشركة تعمل في منطقة العاصمة ومناطق أخرى، لكن تفاصيل التوزيع التشغيلية ليست قائمة عامة كاملة في المصادر المفتوحة التي فُحصت."],
+    ["02", "جودة الخدمة", "تقول Taksi Helsinki إن هدفها تقديم خدمة عالية الجودة وآمنة ومتاحة، وإن تجربة العميل تأتي أولًا."],
+    ["03", "رضا العملاء", "تذكر الصفحة الرسمية أن الشركة تراقب رضا العملاء باستمرار وتطور خدماتها وفق احتياجات العملاء وتوقعاتهم."],
+    ["04", "التصاريح السارية", "تذكر Taksi Helsinki أن سياراتها تحمل رخصة نقل تاكسي سارية، وأن كل سائق في نظام الإرسال يملك تصريح سائق تاكسي ساريًا."],
+    ["05", "نطاق الخدمة المنشور", "تقول الصفحة الرسمية إن الشركة تعمل في منطقة العاصمة وتتوسع على المستوى الوطني، وتذكر مناطق محددة لخدمات Kela وSote. يجب التحقق من الصفحة الحالية قبل اعتماد أي منطقة تشغيلية."],
+    ["06", "المطار والموانئ", "هذه المنصة لا تخترع مناطق انتظار أو مسارات تشغيلية؛ راجع تعليمات الشركة الحالية أو التدريب المدفوع عند توفرها."],
+    ["07", "حدود المعرفة العامة", "لا توجد في المصادر المفتوحة المفحوصة خريطة تشغيلية كاملة أو دليل عام يشرح كل إجراءات السائق الداخلية، لذلك نترك هذه النقاط معلّمة بدل التخمين."],
   ],
 };
 
@@ -491,7 +559,7 @@ function Dashboard({ studyProgress, onStartQuiz, onNavigate, onOpenModule }: { s
     <section className="hero-panel"><div className="hero-copy"><div className="hero-kicker"><span className="live-dot" /> خطة Taksi Helsinki · المستوى الأول</div><h2>أنت على الطريق الصحيح<br /><em>واصل التقدم.</em></h2><p>راجعت 12 من أصل 16 درسًا. أكمل أساسيات المسار قبل الانتقال إلى التدريب الميداني.</p><div className="hero-actions"><button className="light-button" onClick={() => onOpenModule("01")}>متابعة الدرس <ArrowLeft size={16} /></button><span className="hero-meta"><Clock3 size={14} /> 18 دقيقة متبقية</span></div></div><div className="hero-orbit"><div className="orbit-ring ring-one" /><div className="orbit-ring ring-two" /><div className="orbit-core"><ShieldCheck size={35} /><span>82%</span></div><div className="orbit-chip chip-one"><Check size={13} /> اللغة</div><div className="orbit-chip chip-two"><Target size={13} /> المسار</div></div></section>
     <div className="section-heading"><div><h2>لوحة التقدم</h2><p>مؤشراتك في هذه الرحلة التعليمية</p></div><button className="text-button" onClick={() => onNavigate("path")}>عرض المسار كاملًا <ArrowLeft size={15} /></button></div>
     <section className="stats-grid"><StatCard icon={BarChart3} label="نسبة الإكمال" value="68%" note="+12% هذا الأسبوع" color="amber" /><StatCard icon={BookOpen} label="دروس مكتملة" value="12" note="من أصل 24 درسًا" color="blue" /><StatCard icon={Trophy} label="أفضل نتيجة" value={`${studyProgress.bestScore}%`} note={`${studyProgress.sessions} جلسة مكتملة`} color="teal" /><StatCard icon={Zap} label="أيام متتالية" value="4" note="هدفك: 7 أيام" color="violet" /></section>
-    <div className="content-grid"><section><div className="section-heading compact"><div><h2>مساراتك الحالية</h2><p>محتوى مختصر مع مرجع لكل محور</p></div><button className="text-button" onClick={() => onNavigate("path")}>كل المسارات <ArrowLeft size={15} /></button></div><div className="module-list">{modules.slice(0, 3).map((module) => <ModuleRow key={module.id} module={module} onClick={() => onOpenModule(module.id)} />)}</div></section><aside className="side-column"><div className="quiz-card"><div className="quiz-card-head"><div className="quiz-card-icon"><Brain size={20} /></div><span>تحدي اليوم</span><MoreHorizontal size={18} /></div><h3>هل أنت جاهز لاختبار قصير؟</h3><p>{questions.length} أسئلة أصلية مبنية على مصادر رسمية، بلا أسئلة امتحان مسرّبة.</p><div className="quiz-footer"><span><Clock3 size={14} /> 10 دقائق</span><button onClick={onStartQuiz}>ابدأ <ArrowLeft size={14} /></button></div></div><div className="source-note"><div className="note-icon"><FileCheck2 size={18} /></div><div><strong>قاعدة المنصة</strong><p>نميز دائمًا بين <b>رسمي</b> و<b>شرح تعليمي</b> و<b>سؤال تدريبي</b>.</p></div></div></aside></div>
+    <div className="content-grid"><section><div className="section-heading compact"><div><h2>مساراتك الحالية</h2><p>محتوى مختصر مع مرجع لكل محور</p></div><button className="text-button" onClick={() => onNavigate("path")}>كل المسارات <ArrowLeft size={15} /></button></div><div className="module-list">{modules.slice(0, 3).map((module) => <ModuleRow key={module.id} module={module} onClick={() => onOpenModule(module.id)} />)}</div></section><aside className="side-column"><div className="quiz-card"><div className="quiz-card-head"><div className="quiz-card-icon"><Brain size={20} /></div><span>تحدي اليوم</span><MoreHorizontal size={18} /></div><h3>هل أنت جاهز لاختبار قصير؟</h3><p>{questions.length} أسئلة أصلية مبنية على مصادر رسمية، بلا أسئلة امتحان مسرّبة.</p><div className="quiz-footer"><span><Clock3 size={14} /> 15 دقيقة</span><button onClick={onStartQuiz}>ابدأ <ArrowLeft size={14} /></button></div></div><div className="source-note"><div className="note-icon"><FileCheck2 size={18} /></div><div><strong>قاعدة المنصة</strong><p>نميز دائمًا بين <b>رسمي</b> و<b>شرح تعليمي</b> و<b>سؤال تدريبي</b>.</p></div></div></aside></div>
     <section className="bottom-strip"><div className="strip-icon"><FileText size={20} /></div><div><strong>آخر تحديث للمحتوى</strong><p>18 أغسطس 2026 · تم فحص صفحات Taksi Helsinki وTraficom وKela الرسمية.</p></div><button onClick={() => onNavigate("sources")}>راجع المصادر <ExternalLink size={15} /></button></section>
   </div>;
 }
@@ -514,7 +582,7 @@ function TrainingPath({ selectedModule, onSelectModule, onStartQuiz }: { selecte
 }
 
 function QuizView({ started, completed, startQuiz, currentQuestion, quizIndex, selectedAnswer, answers, quizScore, onAnswer, onNext, onRestart, onBack }: { started: boolean; completed: boolean; startQuiz: () => void; currentQuestion: Question; quizIndex: number; selectedAnswer: number | null; answers: Record<number, number>; quizScore: number; onAnswer: (answer: number) => void; onNext: () => void; onRestart: () => void; onBack: () => void }) {
-  if (!started) return <div className="page-wrap"><section className="quiz-intro"><div className="quiz-intro-icon"><Brain size={38} /></div><div className="eyebrow-line">بنك الأسئلة · تدريب أصلي</div><h1>اختبر جاهزيتك بهدوء</h1><p>جلسة قصيرة من {questions.length} أسئلة مبنية على معلومات قابلة للتحقق من Taksi Helsinki وTraficom وKela. هذه الأسئلة تدريبية وليست أسئلة الامتحان الحقيقي.</p><div className="quiz-feature-row"><span><FileCheck2 size={17} /> مصادر مرفقة</span><span><TimerReset size={17} /> 10 دقائق</span><span><Target size={17} /> نتيجة فورية</span></div><button className="primary-button" onClick={startQuiz}><Play size={17} fill="currentColor" /> ابدأ الاختبار القصير</button><button className="back-link" onClick={onBack}><ArrowRightIcon /> العودة إلى لوحة التحكم</button></section></div>;
+  if (!started) return <div className="page-wrap"><section className="quiz-intro"><div className="quiz-intro-icon"><Brain size={38} /></div><div className="eyebrow-line">بنك الأسئلة · تدريب أصلي</div><h1>اختبر جاهزيتك بهدوء</h1><p>جلسة قصيرة من {questions.length} أسئلة مبنية على معلومات قابلة للتحقق من Taksi Helsinki وTraficom وKela. هذه الأسئلة تدريبية وليست أسئلة الامتحان الحقيقي.</p><div className="quiz-feature-row"><span><FileCheck2 size={17} /> مصادر مرفقة</span><span><TimerReset size={17} /> 15 دقيقة</span><span><Target size={17} /> نتيجة فورية</span></div><button className="primary-button" onClick={startQuiz}><Play size={17} fill="currentColor" /> ابدأ الاختبار القصير</button><button className="back-link" onClick={onBack}><ArrowRightIcon /> العودة إلى لوحة التحكم</button></section></div>;
   const isLast = quizIndex === questions.length - 1;
   const hasAnswer = selectedAnswer !== null;
   return <div className="page-wrap quiz-page"><div className="quiz-topline"><button className="back-link" onClick={onBack}><ChevronRightIcon /> إنهاء الجلسة</button><div className="quiz-progress-copy"><span>سؤال {quizIndex + 1} من {questions.length}</span><div className="quiz-progress-track"><span style={{ width: `${((quizIndex + 1) / questions.length) * 100}%` }} /></div></div><span className="score-pill"><Trophy size={14} /> {quizScore} صحيحة</span></div><div className="quiz-question-card"><div className="question-meta"><span className="category-pill">{currentQuestion.category}</span><SourceBadge>تدريبي</SourceBadge></div><h1 dir="ltr">{currentQuestion.finnish}</h1><p className="arabic-question">{currentQuestion.arabic}</p><div className="options-list">{currentQuestion.options.map((option, index) => { const isChosen = selectedAnswer === index; const isCorrect = hasAnswer && index === currentQuestion.answer; const isWrong = isChosen && index !== currentQuestion.answer; return <button key={option} className={`option ${isChosen ? "chosen" : ""} ${isCorrect ? "correct" : ""} ${isWrong ? "wrong" : ""}`} onClick={() => !hasAnswer && onAnswer(index)}><span className="option-letter">{String.fromCharCode(65 + index)}</span><span>{option}</span>{isCorrect && <Check size={18} />}{isWrong && <X size={18} />}</button>; })}</div>{hasAnswer && <div className={`answer-feedback ${selectedAnswer === currentQuestion.answer ? "positive" : "negative"}`}><div>{selectedAnswer === currentQuestion.answer ? <Check size={18} /> : <Info size={18} />}</div><p><strong>{selectedAnswer === currentQuestion.answer ? "إجابة صحيحة" : "راجع هذه النقطة"}</strong>{currentQuestion.explanation}<small>المصدر: {currentQuestion.source}</small></p></div>}<div className="question-actions"><span><LockKeyhole size={14} /> لا نحفظ بيانات شخصية</span>{hasAnswer && (completed ? <button className="secondary-button" onClick={onRestart}><Play size={14} /> إعادة الاختبار</button> : <button className="primary-button" onClick={onNext}>{isLast ? "عرض النتيجة" : "السؤال التالي"} <ArrowLeft size={16} /></button>)}</div></div>{isLast && hasAnswer && completed && <div className="quiz-result"><Trophy size={23} /><div><strong>أكملت جلسة المراجعة</strong><span>نتيجتك {quizScore} من {questions.length}. ارجع للمصادر إذا أخطأت في سؤال.</span></div><button className="text-button" onClick={onBack}>العودة للوحة <ArrowLeft size={14} /></button></div>}</div>;
