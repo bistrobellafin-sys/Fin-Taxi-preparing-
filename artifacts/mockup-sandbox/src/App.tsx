@@ -51,6 +51,13 @@ type Question = {
   source: string;
 };
 
+type StudyProgress = {
+  bestScore: number;
+  sessions: number;
+};
+
+const defaultStudyProgress: StudyProgress = { bestScore: 86, sessions: 1 };
+
 const sources = [
   {
     id: "th-training",
@@ -263,6 +270,15 @@ function App() {
   const [darkMode, setDarkMode] = useState(false);
   const [quizStarted, setQuizStarted] = useState(false);
   const [quizCompleted, setQuizCompleted] = useState(false);
+  const [studyProgress, setStudyProgress] = useState<StudyProgress>(() => {
+    if (typeof window === "undefined") return defaultStudyProgress;
+    try {
+      const saved = window.localStorage.getItem("taksi-pro-study-progress");
+      return saved ? { ...defaultStudyProgress, ...JSON.parse(saved) } : defaultStudyProgress;
+    } catch {
+      return defaultStudyProgress;
+    }
+  });
   const [quizIndex, setQuizIndex] = useState(0);
   const [selectedAnswer, setSelectedAnswer] = useState<number | null>(null);
   const [answers, setAnswers] = useState<Record<number, number>>({});
@@ -301,6 +317,18 @@ function App() {
       setSelectedAnswer(answers[quizIndex + 1] ?? null);
       return;
     }
+    const completedAnswers = { ...answers, [quizIndex]: selectedAnswer ?? answers[quizIndex] ?? -1 };
+    const finalScore = Object.entries(completedAnswers).filter(([index, answer]) => questions[Number(index)].answer === answer).length;
+    const nextProgress = {
+      bestScore: Math.max(studyProgress.bestScore, Math.round((finalScore / questions.length) * 100)),
+      sessions: studyProgress.sessions + 1,
+    };
+    setStudyProgress(nextProgress);
+    try {
+      window.localStorage.setItem("taksi-pro-study-progress", JSON.stringify(nextProgress));
+    } catch {
+      // Local progress is optional when browser storage is unavailable.
+    }
     setQuizCompleted(true);
   }
 
@@ -337,7 +365,7 @@ function App() {
       <main className="main-content">
         <header className="topbar"><button className="icon-button menu-toggle" onClick={() => setMobileMenu(true)}><Menu size={20} /></button><div className="breadcrumbs"><span>مساحة الدراسة</span><ChevronLeft size={14} /><strong>{navItems.find((item) => item.key === activeNav)?.label}</strong></div><div className="topbar-actions"><div className="sync-status"><span className="status-dot" /> آخر حفظ منذ 3 دقائق</div><button className="icon-button"><Search size={18} /></button><button className="notification"><span>2</span><CircleHelp size={18} /></button><div className="top-avatar">م</div></div></header>
 
-        {activeNav === "home" && <Dashboard onStartQuiz={startQuiz} onNavigate={navigate} onOpenModule={(id) => { setSelectedModule(id); setActiveNav("path"); }} />}
+        {activeNav === "home" && <Dashboard studyProgress={studyProgress} onStartQuiz={startQuiz} onNavigate={navigate} onOpenModule={(id) => { setSelectedModule(id); setActiveNav("path"); }} />}
         {activeNav === "path" && <TrainingPath selectedModule={selectedModule} onSelectModule={setSelectedModule} onStartQuiz={startQuiz} />}
         {activeNav === "quiz" && <QuizView started={quizStarted} completed={quizCompleted} startQuiz={startQuiz} currentQuestion={currentQuestion} quizIndex={quizIndex} selectedAnswer={selectedAnswer} answers={answers} quizScore={quizScore} onAnswer={answerQuestion} onNext={nextQuestion} onRestart={startQuiz} onBack={() => { setQuizStarted(false); setQuizCompleted(false); setActiveNav("home"); }} />}
         {activeNav === "glossary" && <Glossary search={glossarySearch} onSearch={setGlossarySearch} terms={filteredGlossary} />}
@@ -347,12 +375,12 @@ function App() {
   );
 }
 
-function Dashboard({ onStartQuiz, onNavigate, onOpenModule }: { onStartQuiz: () => void; onNavigate: (key: NavKey) => void; onOpenModule: (id: string) => void }) {
+function Dashboard({ studyProgress, onStartQuiz, onNavigate, onOpenModule }: { studyProgress: StudyProgress; onStartQuiz: () => void; onNavigate: (key: NavKey) => void; onOpenModule: (id: string) => void }) {
   return <div className="page-wrap">
     <section className="welcome-row"><div><div className="eyebrow-line"><Sparkles size={15} /> الخميس، 18 أغسطس 2026</div><h1>مساء الخير، محمد <span>👋</span></h1><p>خطوة واحدة كل يوم. اجعل معرفتك أهدأ من الطريق.</p></div><button className="primary-button" onClick={onStartQuiz}><Play size={17} fill="currentColor" /> ابدأ جلسة تدريب</button></section>
     <section className="hero-panel"><div className="hero-copy"><div className="hero-kicker"><span className="live-dot" /> خطة Taksi Helsinki · المستوى الأول</div><h2>أنت على الطريق الصحيح<br /><em>واصل التقدم.</em></h2><p>راجعت 12 من أصل 16 درسًا. أكمل أساسيات المسار قبل الانتقال إلى التدريب الميداني.</p><div className="hero-actions"><button className="light-button" onClick={() => onOpenModule("01")}>متابعة الدرس <ArrowLeft size={16} /></button><span className="hero-meta"><Clock3 size={14} /> 18 دقيقة متبقية</span></div></div><div className="hero-orbit"><div className="orbit-ring ring-one" /><div className="orbit-ring ring-two" /><div className="orbit-core"><ShieldCheck size={35} /><span>82%</span></div><div className="orbit-chip chip-one"><Check size={13} /> اللغة</div><div className="orbit-chip chip-two"><Target size={13} /> المسار</div></div></section>
     <div className="section-heading"><div><h2>لوحة التقدم</h2><p>مؤشراتك في هذه الرحلة التعليمية</p></div><button className="text-button" onClick={() => onNavigate("path")}>عرض المسار كاملًا <ArrowLeft size={15} /></button></div>
-    <section className="stats-grid"><StatCard icon={BarChart3} label="نسبة الإكمال" value="68%" note="+12% هذا الأسبوع" color="amber" /><StatCard icon={BookOpen} label="دروس مكتملة" value="12" note="من أصل 24 درسًا" color="blue" /><StatCard icon={Trophy} label="أفضل نتيجة" value="86%" note="جلسة 16 أغسطس" color="teal" /><StatCard icon={Zap} label="أيام متتالية" value="4" note="هدفك: 7 أيام" color="violet" /></section>
+    <section className="stats-grid"><StatCard icon={BarChart3} label="نسبة الإكمال" value="68%" note="+12% هذا الأسبوع" color="amber" /><StatCard icon={BookOpen} label="دروس مكتملة" value="12" note="من أصل 24 درسًا" color="blue" /><StatCard icon={Trophy} label="أفضل نتيجة" value={`${studyProgress.bestScore}%`} note={`${studyProgress.sessions} جلسة مكتملة`} color="teal" /><StatCard icon={Zap} label="أيام متتالية" value="4" note="هدفك: 7 أيام" color="violet" /></section>
     <div className="content-grid"><section><div className="section-heading compact"><div><h2>مساراتك الحالية</h2><p>محتوى مختصر مع مرجع لكل محور</p></div><button className="text-button" onClick={() => onNavigate("path")}>كل المسارات <ArrowLeft size={15} /></button></div><div className="module-list">{modules.slice(0, 3).map((module) => <ModuleRow key={module.id} module={module} onClick={() => onOpenModule(module.id)} />)}</div></section><aside className="side-column"><div className="quiz-card"><div className="quiz-card-head"><div className="quiz-card-icon"><Brain size={20} /></div><span>تحدي اليوم</span><MoreHorizontal size={18} /></div><h3>هل أنت جاهز لاختبار قصير؟</h3><p>5 أسئلة أصلية مبنية على مصادر رسمية، بلا أسئلة امتحان مسرّبة.</p><div className="quiz-footer"><span><Clock3 size={14} /> 5 دقائق</span><button onClick={onStartQuiz}>ابدأ <ArrowLeft size={14} /></button></div></div><div className="source-note"><div className="note-icon"><FileCheck2 size={18} /></div><div><strong>قاعدة المنصة</strong><p>نميز دائمًا بين <b>رسمي</b> و<b>شرح تعليمي</b> و<b>سؤال تدريبي</b>.</p></div></div></aside></div>
     <section className="bottom-strip"><div className="strip-icon"><FileText size={20} /></div><div><strong>آخر تحديث للمحتوى</strong><p>18 أغسطس 2026 · تم فحص صفحات Taksi Helsinki وTraficom وKela الرسمية.</p></div><button onClick={() => onNavigate("sources")}>راجع المصادر <ExternalLink size={15} /></button></section>
   </div>;
@@ -368,10 +396,11 @@ function ModuleRow({ module, onClick }: { module: typeof modules[number]; onClic
 }
 
 function TrainingPath({ selectedModule, onSelectModule, onStartQuiz }: { selectedModule: string; onSelectModule: (id: string) => void; onStartQuiz: () => void }) {
+  const [activeLesson, setActiveLesson] = useState<string | null>(null);
   const detail = moduleDetails[selectedModule as keyof typeof moduleDetails];
   const selected = modules.find((module) => module.id === selectedModule) ?? modules[0];
   const Icon = selected.icon;
-  return <div className="page-wrap"><section className="page-heading"><div><div className="eyebrow-line"><BookOpenCheck size={15} /> المنهج الموثق</div><h1>مسار التدريب</h1><p>محتوى عملي، مترجم، ومربوط بالمصدر الأصلي لكل موضوع.</p></div><button className="secondary-button" onClick={onStartQuiz}><Brain size={16} /> اختبر نفسك</button></section><div className="path-layout"><aside className="path-nav"><div className="path-nav-head"><span>المنهج الكامل</span><small>4 وحدات</small></div>{modules.map((module) => { const ModuleIcon = module.icon; return <button key={module.id} onClick={() => onSelectModule(module.id)} className={`path-nav-item ${selectedModule === module.id ? "selected" : ""}`}><div className={`module-icon small ${module.color}`}><ModuleIcon size={16} /></div><div><strong>{module.id} · {module.title}</strong><span>{module.progress === 0 ? "لم تبدأ" : `${module.progress}% مكتمل`}</span></div><ChevronLeft size={15} /></button>; })}<div className="path-total"><div className="circular-progress"><span>68%</span></div><div><strong>التقدم الكلي</strong><span>12 من 24 درسًا</span></div></div></aside><section className="lesson-panel"><div className={`lesson-banner ${selected.color}`}><div className="lesson-banner-copy"><span className="lesson-eyebrow">الوحدة {selected.id} · {selected.eyebrow}</span><h2>{selected.title}</h2><p>{selected.description}</p><SourceBadge>{selected.source}</SourceBadge></div><div className="lesson-visual"><Icon size={42} /><span>{selected.progress}%</span></div></div><div className="lesson-meta-row"><span><Clock3 size={15} /> {selected.duration}</span><span><BookOpen size={15} /> {selected.lessons} دروس</span><span><ShieldCheck size={15} /> مصدر لكل درس</span><button className="outline-button" onClick={onStartQuiz}><Play size={14} /> جلسة مراجعة</button></div><div className="lesson-list">{detail.map(([number, title, description], index) => <div className={`lesson-item ${index < Math.ceil(selected.progress / 25) ? "done" : ""}`} key={number}><div className="lesson-check">{index < Math.ceil(selected.progress / 25) ? <Check size={14} /> : <span>{number}</span>}</div><div className="lesson-item-copy"><div><strong>{title}</strong>{index < Math.ceil(selected.progress / 25) && <span className="completed-label">مكتمل</span>}</div><p>{description}</p></div><button className="lesson-open">{index < Math.ceil(selected.progress / 25) ? "مراجعة" : "فتح"} <ArrowLeft size={14} /></button></div>)}</div><div className="verified-callout"><div><Info size={18} /></div><p><strong>ملاحظة منهجية:</strong> تفاصيل نظام السائق الداخلية، مثل أزرار Autocab أو إجراءات الأعطال، لا تُعرض كحقائق إلا إذا كانت في دليل رسمي عام قابل للتحقق. المحتوى المدفوع غير متاح لنا.</p></div></section></div></div>;
+  return <div className="page-wrap"><section className="page-heading"><div><div className="eyebrow-line"><BookOpenCheck size={15} /> المنهج الموثق</div><h1>مسار التدريب</h1><p>محتوى عملي، مترجم، ومربوط بالمصدر الأصلي لكل موضوع.</p></div><button className="secondary-button" onClick={onStartQuiz}><Brain size={16} /> اختبر نفسك</button></section><div className="path-layout"><aside className="path-nav"><div className="path-nav-head"><span>المنهج الكامل</span><small>4 وحدات</small></div>{modules.map((module) => { const ModuleIcon = module.icon; return <button key={module.id} onClick={() => onSelectModule(module.id)} className={`path-nav-item ${selectedModule === module.id ? "selected" : ""}`}><div className={`module-icon small ${module.color}`}><ModuleIcon size={16} /></div><div><strong>{module.id} · {module.title}</strong><span>{module.progress === 0 ? "لم تبدأ" : `${module.progress}% مكتمل`}</span></div><ChevronLeft size={15} /></button>; })}<div className="path-total"><div className="circular-progress"><span>68%</span></div><div><strong>التقدم الكلي</strong><span>12 من 24 درسًا</span></div></div></aside><section className="lesson-panel"><div className={`lesson-banner ${selected.color}`}><div className="lesson-banner-copy"><span className="lesson-eyebrow">الوحدة {selected.id} · {selected.eyebrow}</span><h2>{selected.title}</h2><p>{selected.description}</p><SourceBadge>{selected.source}</SourceBadge></div><div className="lesson-visual"><Icon size={42} /><span>{selected.progress}%</span></div></div><div className="lesson-meta-row"><span><Clock3 size={15} /> {selected.duration}</span><span><BookOpen size={15} /> {selected.lessons} دروس</span><span><ShieldCheck size={15} /> مصدر لكل درس</span><button className="outline-button" onClick={onStartQuiz}><Play size={14} /> جلسة مراجعة</button></div><div className="lesson-list">{detail.map(([number, title, description], index) => <div className={`lesson-item ${index < Math.ceil(selected.progress / 25) ? "done" : ""}`} key={number}><div className="lesson-check">{index < Math.ceil(selected.progress / 25) ? <Check size={14} /> : <span>{number}</span>}</div><div className="lesson-item-copy"><div><strong>{title}</strong>{index < Math.ceil(selected.progress / 25) && <span className="completed-label">مكتمل</span>}</div><p>{description}</p></div><button className="lesson-open" onClick={() => setActiveLesson(activeLesson === number ? null : number)}>{activeLesson === number ? "إخفاء" : index < Math.ceil(selected.progress / 25) ? "مراجعة" : "فتح"} <ArrowLeft size={14} /></button>{activeLesson === number && <div className="lesson-preview"><strong>ملخص الدرس</strong><p>{description}</p><span><ShieldCheck size={13} /> شرح تعليمي مرتبط بالمحتوى الموثق</span></div>}</div>)}</div><div className="verified-callout"><div><Info size={18} /></div><p><strong>ملاحظة منهجية:</strong> تفاصيل نظام السائق الداخلية، مثل أزرار Autocab أو إجراءات الأعطال، لا تُعرض كحقائق إلا إذا كانت في دليل رسمي عام قابل للتحقق. المحتوى المدفوع غير متاح لنا.</p></div></section></div></div>;
 }
 
 function QuizView({ started, completed, startQuiz, currentQuestion, quizIndex, selectedAnswer, answers, quizScore, onAnswer, onNext, onRestart, onBack }: { started: boolean; completed: boolean; startQuiz: () => void; currentQuestion: Question; quizIndex: number; selectedAnswer: number | null; answers: Record<number, number>; quizScore: number; onAnswer: (answer: number) => void; onNext: () => void; onRestart: () => void; onBack: () => void }) {
