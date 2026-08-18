@@ -87,6 +87,15 @@ const sources = [
     accent: "teal",
   },
   {
+    id: "traficom-reform",
+    name: "Changes to taxi transport regulation",
+    publisher: "Traficom",
+    type: "تشريعات وتواريخ قادمة",
+    date: "آخر تحديث 03.08.2026 · يحتاج مراجعة عند سريان التغيير",
+    url: "https://traficom.fi/en/commercial-transport/changes-taxi-transport-regulation",
+    accent: "rose",
+  },
+  {
     id: "kela-taxi",
     name: "Using a taxi",
     publisher: "Kela",
@@ -186,7 +195,7 @@ const questions: Question[] = [
     arabic: "كيف ينبغي عادةً طلب رحلة التاكسي التي تعوّضها Kela؟",
     options: ["من أي سيارة في الشارع", "من رقم مركز الطلب الإقليمي", "من الفندق فقط", "لا يلزم الطلب مسبقًا"],
     answer: 1,
-    explanation: "توضح Kela أن الرحلة يجب طلبها من مركز الطلب الإقليمي، ويفضل مسبقًا إن أمكن في اليوم السابق.",
+    explanation: "توضح Kela أن الرحلة التي تعوّضها يجب طلبها من مركز الطلب الإقليمي؛ يختلف رقم المركز حسب المنطقة.",
     source: "Kela · Using a taxi",
   },
   {
@@ -206,6 +215,69 @@ const questions: Question[] = [
     answer: 2,
     explanation: "بعد النجاح في اختبار Taksi Helsinki، تذكر الشركة أن koulutusajo إلزامي ويستغرق نحو 8 ساعات.",
     source: "Taksi Helsinki · Koulutusosio 2",
+  },
+  {
+    category: "Traficom · شروط الرخصة",
+    finnish: "Kuinka kauan B-ajokortin on yleensä pitänyt olla myönnettynä?",
+    arabic: "منذ متى يجب أن تكون رخصة القيادة من الفئة B صادرة عادةً قبل طلب رخصة التاكسي؟",
+    options: ["ثلاثة أشهر", "سنة واحدة على الأقل", "سنتان", "لا توجد مدة"],
+    answer: 1,
+    explanation: "تذكر Traficom أن رخصة B الفنلندية أو الأوروبية يجب أن تكون صادرة قبل سنة واحدة على الأقل، مع بقية الشروط المنشورة.",
+    source: "Traficom · Apply for a taxi driving licence",
+  },
+  {
+    category: "تغيير تشريعي قادم",
+    finnish: "Milloin uusien taksinkuljettajien 21 tunnin koulutus tulee suorittaa ennen koetta?",
+    arabic: "متى يجب على السائقين الجدد إكمال التدريب الإلزامي لمدة 21 ساعة قبل الاختبار؟",
+    options: ["1 سبتمبر 2026", "1 نوفمبر 2026", "1 فبراير 2027", "1 يوليو 2027"],
+    answer: 1,
+    explanation: "هذه قاعدة مستقبلية منشورة من Traficom: تبدأ للسائقين الجدد في 1 نوفمبر 2026. لا تُعرض كقاعدة سارية قبل تاريخها.",
+    source: "Traficom · Changes to taxi transport regulation",
+  },
+  {
+    category: "Taksi Helsinki · المجموعات الخاصة",
+    finnish: "Kuinka pitkä Taksi Helsingin erityisryhmien koulutus on kokonaisuudessaan?",
+    arabic: "ما المدة الإجمالية لتدريب Taksi Helsinki الخاص بالمجموعات الخاصة؟",
+    options: ["7 ساعات", "14 ساعة", "21 ساعة", "50 ساعة"],
+    answer: 2,
+    explanation: "توضح صفحة Taksi Helsinki أن التدريب الكامل للمجموعات الخاصة 21 ساعة: 14 ساعة نظرية و7 ساعات عملية، مع اختلاف القاعدة بحسب تاريخ رخصة السائق.",
+    source: "Taksi Helsinki · Kuljettajakoulutus",
+  },
+  {
+    category: "Kela",
+    finnish: "Mitä tehdä, jos Kela-taksi ei saavu sovittuna aikana?",
+    arabic: "ماذا تفعل إذا لم تصل سيارة Kela في الوقت المتفق عليه؟",
+    options: ["الاتصال بمركز الطلب الذي حُجزت منه الرحلة", "إلغاء الرحلة دون إبلاغ", "الانتظار حتى اليوم التالي", "حجز أي سيارة وتقديمها كرحلة Kela"],
+    answer: 0,
+    explanation: "تطلب Kela الاتصال بمركز الطلب الذي تم الحجز منه؛ وعلى المركز ترتيب وسيلة نقل أخرى عند عدم وصول التاكسي.",
+    source: "Kela · Using a taxi",
+  },
+  {
+    category: "Traficom · مدة الرخصة",
+    finnish: "Kuinka kauan taksinkuljettajan ajolupa on yleensä voimassa?",
+    arabic: "ما مدة صلاحية رخصة قيادة التاكسي عادةً؟",
+    options: ["سنة واحدة", "خمس سنوات", "عشر سنوات", "غير محددة"],
+    answer: 1,
+    explanation: "توضح Traficom أن الرخصة صالحة خمس سنوات، أو سنتين إذا كان عمر حاملها 68 عامًا أو أكثر.",
+    source: "Traficom · Apply for a taxi driving licence",
+  },
+  {
+    category: "Traficom · مكان الاختبار",
+    finnish: "Missä taksinkuljettajan koe suoritetaan?",
+    arabic: "أين يُجرى اختبار سائق التاكسي؟",
+    options: ["في مركز Ajovarma بعد حجز موعد", "في أي فندق", "في سيارة العميل", "لا يحتاج إلى موعد"],
+    answer: 0,
+    explanation: "تذكر Traficom أن اختبار سائق التاكسي يُجرى في نقطة خدمة Ajovarma، مع حجز موعد مسبق.",
+    source: "Traficom · Apply for a taxi driving licence",
+  },
+  {
+    category: "Kela · وقت الوصول",
+    finnish: "Milloin Kela-taksin pitäisi saapua sovitulle noutoajalle?",
+    arabic: "متى ينبغي أن تصل سيارة Kela بالنسبة إلى موعد الاستلام المتفق عليه؟",
+    options: ["خلال 15 دقيقة من الموعد", "بعد ساعة على الأقل", "في نهاية اليوم", "لا توجد إرشادات"],
+    answer: 0,
+    explanation: "تذكر Kela أن سيارة التاكسي ينبغي أن تصل خلال 15 دقيقة من وقت الاستلام المتفق عليه.",
+    source: "Kela · Using a taxi",
   },
 ];
 
@@ -237,12 +309,17 @@ const moduleDetails = {
     ["02", "لغة العمل", "تنص Taksi Helsinki على أن التدريب والاختبار الخاصين بها يُنفذان باللغة الفنلندية."],
     ["03", "50 سؤالًا / 45 دقيقة", "معلومة رسمية تخص اختبار Traficom: 50 سؤال اختيار من متعدد، بحد أقصى 45 دقيقة، وإجابة واحدة صحيحة تمامًا لكل سؤال."],
     ["04", "ممنوعات الاختبار", "تمنع Traficom الهواتف وسماعات الرأس وأجهزة الاتصال أو التسجيل والمواد التي تساعد على الغش داخل منطقة الاختبار."],
+    ["05", "تغيير قادم في 1 سبتمبر 2026", "تقول Traficom إن اختبار سائق التاكسي سيُراجع في 1 سبتمبر 2026، مع إضافة موضوع حقوق السائق وواجباته وزيادة عدد الأسئلة بعشرة. هذه معلومة مستقبلية ويجب مراجعتها عند بدء سريانها."],
+    ["06", "مكان الاختبار", "توضح Traficom أن اختبار سائق التاكسي يُجرى في نقطة خدمة Ajovarma، ويجب حجز موعد مسبقًا."],
+    ["07", "مدة صلاحية الرخصة", "تذكر Traficom أن رخصة قيادة التاكسي صالحة خمس سنوات، أو سنتين لمن يبلغ 68 عامًا أو أكثر."],
   ],
   "03": [
     ["01", "مركز الطلب الإقليمي", "رحلة Kela تُطلب من مركز إقليمي. في Uusimaa يظهر رقم Taksi Helsinki الرسمي: 0800 414 600، مع رقم سويدي منفصل."],
-    ["02", "الطلب المسبق", "توصي Kela بالطلب مسبقًا، وإن أمكن في موعد لا يتجاوز اليوم السابق للرحلة."],
+    ["02", "الطلب المسبق", "استخدم مركز الطلب الإقليمي المنشور من Kela، وتحقق من التعليمات الحالية للمنطقة قبل الرحلة."],
     ["03", "تدريب السائق", "تذكر Taksi Helsinki أن سائقي رحلات Kela أكملوا تدريب المجموعات الخاصة وتدريب Taksi Helsinki الخاص بـ Kela."],
-    ["04", "حدود المعرفة العامة", "تفاصيل نظام السائق الداخلية أو أزرار Autocab لا تُعرض هنا كحقائق ما لم نجد لها دليلًا رسميًا عامًا قابلًا للتحقق."],
+    ["04", "تدريب المجموعات الخاصة", "تذكر Taksi Helsinki أن التدريب الكامل 21 ساعة، منها 14 ساعة نظرية و7 ساعات عملية، مع قاعدة مختلفة لمن حصل على رخصته قبل 1 يوليو 2018."],
+    ["05", "وقت وصول سيارة Kela", "تذكر Kela أن السيارة ينبغي أن تصل خلال 15 دقيقة من وقت الاستلام المتفق عليه. عند عدم الوصول، اتصل بمركز الطلب الذي حُجزت منه الرحلة."],
+    ["06", "حدود المعرفة العامة", "تفاصيل نظام السائق الداخلية أو أزرار Autocab لا تُعرض هنا كحقائق ما لم نجد لها دليلًا رسميًا عامًا قابلًا للتحقق."],
   ],
   "04": [
     ["01", "المعرفة المحلية", "تدرج Taksi Helsinki معرفة pääkaupunkiseutu ضمن التدريب الإلكتروني، كما يذكر التدريب العملي التعرف على الأماكن المهمة."],
@@ -354,7 +431,7 @@ function App() {
         </div>
         <nav className="main-nav">
           <p className="nav-label">مساحة الدراسة</p>
-          {navItems.map(({ key, label, icon: Icon }) => <button key={key} className={`nav-item ${activeNav === key ? "active" : ""}`} onClick={() => navigate(key)}><Icon size={18} /><span>{label}</span>{key === "quiz" && <em>5</em>}</button>)}
+          {navItems.map(({ key, label, icon: Icon }) => <button key={key} className={`nav-item ${activeNav === key ? "active" : ""}`} onClick={() => navigate(key)}><Icon size={18} /><span>{label}</span>{key === "quiz" && <em>{questions.length}</em>}</button>)}
         </nav>
         <div className="sidebar-spacer" />
         <div className="help-card"><div className="help-icon"><Headphones size={18} /></div><strong>تحتاج مساعدة؟</strong><span>راجع المصدر قبل أن تعتمد المعلومة.</span><button onClick={() => navigate("sources")}>فتح مركز المراجع <ArrowLeft size={14} /></button></div>
@@ -381,7 +458,7 @@ function Dashboard({ studyProgress, onStartQuiz, onNavigate, onOpenModule }: { s
     <section className="hero-panel"><div className="hero-copy"><div className="hero-kicker"><span className="live-dot" /> خطة Taksi Helsinki · المستوى الأول</div><h2>أنت على الطريق الصحيح<br /><em>واصل التقدم.</em></h2><p>راجعت 12 من أصل 16 درسًا. أكمل أساسيات المسار قبل الانتقال إلى التدريب الميداني.</p><div className="hero-actions"><button className="light-button" onClick={() => onOpenModule("01")}>متابعة الدرس <ArrowLeft size={16} /></button><span className="hero-meta"><Clock3 size={14} /> 18 دقيقة متبقية</span></div></div><div className="hero-orbit"><div className="orbit-ring ring-one" /><div className="orbit-ring ring-two" /><div className="orbit-core"><ShieldCheck size={35} /><span>82%</span></div><div className="orbit-chip chip-one"><Check size={13} /> اللغة</div><div className="orbit-chip chip-two"><Target size={13} /> المسار</div></div></section>
     <div className="section-heading"><div><h2>لوحة التقدم</h2><p>مؤشراتك في هذه الرحلة التعليمية</p></div><button className="text-button" onClick={() => onNavigate("path")}>عرض المسار كاملًا <ArrowLeft size={15} /></button></div>
     <section className="stats-grid"><StatCard icon={BarChart3} label="نسبة الإكمال" value="68%" note="+12% هذا الأسبوع" color="amber" /><StatCard icon={BookOpen} label="دروس مكتملة" value="12" note="من أصل 24 درسًا" color="blue" /><StatCard icon={Trophy} label="أفضل نتيجة" value={`${studyProgress.bestScore}%`} note={`${studyProgress.sessions} جلسة مكتملة`} color="teal" /><StatCard icon={Zap} label="أيام متتالية" value="4" note="هدفك: 7 أيام" color="violet" /></section>
-    <div className="content-grid"><section><div className="section-heading compact"><div><h2>مساراتك الحالية</h2><p>محتوى مختصر مع مرجع لكل محور</p></div><button className="text-button" onClick={() => onNavigate("path")}>كل المسارات <ArrowLeft size={15} /></button></div><div className="module-list">{modules.slice(0, 3).map((module) => <ModuleRow key={module.id} module={module} onClick={() => onOpenModule(module.id)} />)}</div></section><aside className="side-column"><div className="quiz-card"><div className="quiz-card-head"><div className="quiz-card-icon"><Brain size={20} /></div><span>تحدي اليوم</span><MoreHorizontal size={18} /></div><h3>هل أنت جاهز لاختبار قصير؟</h3><p>5 أسئلة أصلية مبنية على مصادر رسمية، بلا أسئلة امتحان مسرّبة.</p><div className="quiz-footer"><span><Clock3 size={14} /> 5 دقائق</span><button onClick={onStartQuiz}>ابدأ <ArrowLeft size={14} /></button></div></div><div className="source-note"><div className="note-icon"><FileCheck2 size={18} /></div><div><strong>قاعدة المنصة</strong><p>نميز دائمًا بين <b>رسمي</b> و<b>شرح تعليمي</b> و<b>سؤال تدريبي</b>.</p></div></div></aside></div>
+    <div className="content-grid"><section><div className="section-heading compact"><div><h2>مساراتك الحالية</h2><p>محتوى مختصر مع مرجع لكل محور</p></div><button className="text-button" onClick={() => onNavigate("path")}>كل المسارات <ArrowLeft size={15} /></button></div><div className="module-list">{modules.slice(0, 3).map((module) => <ModuleRow key={module.id} module={module} onClick={() => onOpenModule(module.id)} />)}</div></section><aside className="side-column"><div className="quiz-card"><div className="quiz-card-head"><div className="quiz-card-icon"><Brain size={20} /></div><span>تحدي اليوم</span><MoreHorizontal size={18} /></div><h3>هل أنت جاهز لاختبار قصير؟</h3><p>{questions.length} أسئلة أصلية مبنية على مصادر رسمية، بلا أسئلة امتحان مسرّبة.</p><div className="quiz-footer"><span><Clock3 size={14} /> 10 دقائق</span><button onClick={onStartQuiz}>ابدأ <ArrowLeft size={14} /></button></div></div><div className="source-note"><div className="note-icon"><FileCheck2 size={18} /></div><div><strong>قاعدة المنصة</strong><p>نميز دائمًا بين <b>رسمي</b> و<b>شرح تعليمي</b> و<b>سؤال تدريبي</b>.</p></div></div></aside></div>
     <section className="bottom-strip"><div className="strip-icon"><FileText size={20} /></div><div><strong>آخر تحديث للمحتوى</strong><p>18 أغسطس 2026 · تم فحص صفحات Taksi Helsinki وTraficom وKela الرسمية.</p></div><button onClick={() => onNavigate("sources")}>راجع المصادر <ExternalLink size={15} /></button></section>
   </div>;
 }
@@ -404,7 +481,7 @@ function TrainingPath({ selectedModule, onSelectModule, onStartQuiz }: { selecte
 }
 
 function QuizView({ started, completed, startQuiz, currentQuestion, quizIndex, selectedAnswer, answers, quizScore, onAnswer, onNext, onRestart, onBack }: { started: boolean; completed: boolean; startQuiz: () => void; currentQuestion: Question; quizIndex: number; selectedAnswer: number | null; answers: Record<number, number>; quizScore: number; onAnswer: (answer: number) => void; onNext: () => void; onRestart: () => void; onBack: () => void }) {
-  if (!started) return <div className="page-wrap"><section className="quiz-intro"><div className="quiz-intro-icon"><Brain size={38} /></div><div className="eyebrow-line">بنك الأسئلة · تدريب أصلي</div><h1>اختبر جاهزيتك بهدوء</h1><p>جلسة قصيرة من 5 أسئلة مبنية على معلومات قابلة للتحقق من Taksi Helsinki وTraficom وKela. هذه الأسئلة تدريبية وليست أسئلة الامتحان الحقيقي.</p><div className="quiz-feature-row"><span><FileCheck2 size={17} /> مصادر مرفقة</span><span><TimerReset size={17} /> 5 دقائق</span><span><Target size={17} /> نتيجة فورية</span></div><button className="primary-button" onClick={startQuiz}><Play size={17} fill="currentColor" /> ابدأ الاختبار القصير</button><button className="back-link" onClick={onBack}><ArrowRightIcon /> العودة إلى لوحة التحكم</button></section></div>;
+  if (!started) return <div className="page-wrap"><section className="quiz-intro"><div className="quiz-intro-icon"><Brain size={38} /></div><div className="eyebrow-line">بنك الأسئلة · تدريب أصلي</div><h1>اختبر جاهزيتك بهدوء</h1><p>جلسة قصيرة من {questions.length} أسئلة مبنية على معلومات قابلة للتحقق من Taksi Helsinki وTraficom وKela. هذه الأسئلة تدريبية وليست أسئلة الامتحان الحقيقي.</p><div className="quiz-feature-row"><span><FileCheck2 size={17} /> مصادر مرفقة</span><span><TimerReset size={17} /> 10 دقائق</span><span><Target size={17} /> نتيجة فورية</span></div><button className="primary-button" onClick={startQuiz}><Play size={17} fill="currentColor" /> ابدأ الاختبار القصير</button><button className="back-link" onClick={onBack}><ArrowRightIcon /> العودة إلى لوحة التحكم</button></section></div>;
   const isLast = quizIndex === questions.length - 1;
   const hasAnswer = selectedAnswer !== null;
   return <div className="page-wrap quiz-page"><div className="quiz-topline"><button className="back-link" onClick={onBack}><ChevronRightIcon /> إنهاء الجلسة</button><div className="quiz-progress-copy"><span>سؤال {quizIndex + 1} من {questions.length}</span><div className="quiz-progress-track"><span style={{ width: `${((quizIndex + 1) / questions.length) * 100}%` }} /></div></div><span className="score-pill"><Trophy size={14} /> {quizScore} صحيحة</span></div><div className="quiz-question-card"><div className="question-meta"><span className="category-pill">{currentQuestion.category}</span><SourceBadge>تدريبي</SourceBadge></div><h1 dir="ltr">{currentQuestion.finnish}</h1><p className="arabic-question">{currentQuestion.arabic}</p><div className="options-list">{currentQuestion.options.map((option, index) => { const isChosen = selectedAnswer === index; const isCorrect = hasAnswer && index === currentQuestion.answer; const isWrong = isChosen && index !== currentQuestion.answer; return <button key={option} className={`option ${isChosen ? "chosen" : ""} ${isCorrect ? "correct" : ""} ${isWrong ? "wrong" : ""}`} onClick={() => !hasAnswer && onAnswer(index)}><span className="option-letter">{String.fromCharCode(65 + index)}</span><span>{option}</span>{isCorrect && <Check size={18} />}{isWrong && <X size={18} />}</button>; })}</div>{hasAnswer && <div className={`answer-feedback ${selectedAnswer === currentQuestion.answer ? "positive" : "negative"}`}><div>{selectedAnswer === currentQuestion.answer ? <Check size={18} /> : <Info size={18} />}</div><p><strong>{selectedAnswer === currentQuestion.answer ? "إجابة صحيحة" : "راجع هذه النقطة"}</strong>{currentQuestion.explanation}<small>المصدر: {currentQuestion.source}</small></p></div>}<div className="question-actions"><span><LockKeyhole size={14} /> لا نحفظ بيانات شخصية</span>{hasAnswer && (completed ? <button className="secondary-button" onClick={onRestart}><Play size={14} /> إعادة الاختبار</button> : <button className="primary-button" onClick={onNext}>{isLast ? "عرض النتيجة" : "السؤال التالي"} <ArrowLeft size={16} /></button>)}</div></div>{isLast && hasAnswer && completed && <div className="quiz-result"><Trophy size={23} /><div><strong>أكملت جلسة المراجعة</strong><span>نتيجتك {quizScore} من {questions.length}. ارجع للمصادر إذا أخطأت في سؤال.</span></div><button className="text-button" onClick={onBack}>العودة للوحة <ArrowLeft size={14} /></button></div>}</div>;
@@ -423,7 +500,7 @@ function Glossary({ search, onSearch, terms }: { search: string; onSearch: (valu
 }
 
 function Sources() {
-  return <div className="page-wrap"><section className="page-heading"><div><div className="eyebrow-line"><Library size={15} /> سجل التحقق</div><h1>المصادر الرسمية</h1><p>لا تعتمد على معلومة مهمة قبل معرفة الجهة التي نشرتها وتاريخ فحصها.</p></div><div className="source-counter"><ShieldCheck size={18} /><strong>5</strong><span>مصادر موثقة</span></div></section><div className="source-principles"><div><ShieldCheck size={21} /><div><strong>ثلاثة أوسمة للمحتوى</strong><p><b className="official-text">رسمي</b> · <b className="explain-text">شرح تعليمي</b> · <b className="practice-text">سؤال تدريبي</b></p></div></div><div><FileText size={21} /><div><strong>تاريخ الوصول واضح</strong><p>المعلومات المتغيرة تحتاج مراجعة دورية.</p></div></div><div><LockKeyhole size={21} /><div><strong>لا محتوى مدفوع</strong><p>لم ندّعِ قراءة منصة أو دليل خاص.</p></div></div></div><div className="sources-list">{sources.map((source, index) => <article className="source-card" key={source.id}><div className={`source-number ${source.accent}`}>{String(index + 1).padStart(2, "0")}</div><div className="source-card-body"><div className="source-title-row"><div><span>{source.publisher}</span><h3>{source.name}</h3></div><ExternalLink size={18} className="source-external" /></div><div className="source-card-meta"><SourceBadge>{source.type}</SourceBadge><span><Clock3 size={13} /> {source.date}</span></div><a href={source.url} target="_blank" rel="noreferrer">فتح المصدر الأصلي <ArrowLeft size={14} /></a></div></article>)}</div><div className="sources-disclaimer"><div className="note-icon"><Info size={18} /></div><p><strong>حدود التحقق:</strong> لم نعثر في المصادر العامة المفحوصة على دليل رسمي منشور يشرح خطوات Autocab الداخلية أو خرائط انتظار المطار والموانئ بالتفصيل. لذلك تظهر هذه الموضوعات كـ «تحتاج مادة رسمية» بدلًا من ملئها بالتخمين.</p></div></div>;
+  return <div className="page-wrap"><section className="page-heading"><div><div className="eyebrow-line"><Library size={15} /> سجل التحقق</div><h1>المصادر الرسمية</h1><p>لا تعتمد على معلومة مهمة قبل معرفة الجهة التي نشرتها وتاريخ فحصها.</p></div><div className="source-counter"><ShieldCheck size={18} /><strong>{sources.length}</strong><span>مصادر موثقة</span></div></section><div className="source-principles"><div><ShieldCheck size={21} /><div><strong>ثلاثة أوسمة للمحتوى</strong><p><b className="official-text">رسمي</b> · <b className="explain-text">شرح تعليمي</b> · <b className="practice-text">سؤال تدريبي</b></p></div></div><div><FileText size={21} /><div><strong>تاريخ الوصول واضح</strong><p>المعلومات المتغيرة تحتاج مراجعة دورية.</p></div></div><div><LockKeyhole size={21} /><div><strong>لا محتوى مدفوع</strong><p>لم ندّعِ قراءة منصة أو دليل خاص.</p></div></div></div><div className="sources-list">{sources.map((source, index) => <article className="source-card" key={source.id}><div className={`source-number ${source.accent}`}>{String(index + 1).padStart(2, "0")}</div><div className="source-card-body"><div className="source-title-row"><div><span>{source.publisher}</span><h3>{source.name}</h3></div><ExternalLink size={18} className="source-external" /></div><div className="source-card-meta"><SourceBadge>{source.type}</SourceBadge><span><Clock3 size={13} /> {source.date}</span></div><a href={source.url} target="_blank" rel="noreferrer">فتح المصدر الأصلي <ArrowLeft size={14} /></a></div></article>)}</div><div className="sources-disclaimer"><div className="note-icon"><Info size={18} /></div><p><strong>حدود التحقق:</strong> لم نعثر في المصادر العامة المفحوصة على دليل رسمي منشور يشرح خطوات Autocab الداخلية أو خرائط انتظار المطار والموانئ بالتفصيل. لذلك تظهر هذه الموضوعات كـ «تحتاج مادة رسمية» بدلًا من ملئها بالتخمين.</p></div></div>;
 }
 
 function ArrowRightIcon() { return <ArrowLeft size={15} />; }
