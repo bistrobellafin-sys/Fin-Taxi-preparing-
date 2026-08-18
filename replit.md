@@ -33,10 +33,10 @@ The frontend lives in `artifacts/mockup-sandbox/src/App.tsx` and currently inclu
 
 - Dashboard with progress metrics and a Taksi Helsinki learning path
 - Four existing guided training modules with source badges and verification boundaries
-- A local knowledge base covering 20 requested topic modules, 24 structured lessons, 38 evidence claims, practical scenarios, and mock-exam groupings
+- A local knowledge base covering 20 requested topic modules, 64 structured lessons, 53 evidence claims, practical scenarios, 120 auditable quiz questions, 48 Finnish–Arabic glossary terms, and 12 mock-exam groupings
 - A current public AD Kuljettaja SOTE module sourced from the 20-page 02.02.2026 guide, plus historical Kela app evidence clearly labelled historical
-- Original practice questions with immediate feedback; the new auditable question set carries `evidenceId`, source page, `trainingQuestion: true`, and `officialExamQuestion: false`
-- Finnish-to-Arabic glossary enriched with terms extracted from the AD and quality documents
+- 120 original practice questions with immediate feedback; each carries `evidenceId`, source page, `trainingQuestion: true`, and `officialExamQuestion: false`
+- Finnish-to-Arabic glossary with 48 terms extracted from the AD, quality, Kela, and operator services documents
 - Official source registry with Current / Historical / Future / Access restricted filters, direct links, and a browser-side `Verify Sources` reachability check
 - Evidence panel showing the source, section, page, claim, and last verification date for each structured lesson
 - `Knowledge Base Audit` view and reports in `docs/KNOWLEDGE_BASE_AUDIT.md`, `docs/OFFICIAL_SOURCES.md`, and `docs/EVIDENCE_MAP.md`

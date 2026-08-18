@@ -1,7 +1,6 @@
 import { useMemo, useState } from "react";
 import {
   ArrowLeft,
-  ArrowUpLeft,
   Award,
   BarChart3,
   BookOpen,
@@ -35,9 +34,7 @@ import {
   TimerReset,
   TrainFront,
   Trophy,
-  UserRound,
   X,
-  Zap,
 } from "lucide-react";
 import {
   evidenceFor,
@@ -67,13 +64,6 @@ type Question = {
   trainingQuestion?: boolean;
   officialExamQuestion?: boolean;
 };
-
-type StudyProgress = {
-  bestScore: number;
-  sessions: number;
-};
-
-const defaultStudyProgress: StudyProgress = { bestScore: 86, sessions: 1 };
 
 const sources = [
   {
@@ -140,10 +130,8 @@ const modules = [
     description: "افهم مراحل التقديم والتدريب كما تنشرها الشركة، بدون خلطها بمتطلبات Traficom.",
     duration: "55 دقيقة",
     lessons: 9,
-    progress: 82,
     icon: ShieldCheck,
     color: "amber",
-    status: "قريب من الإتقان",
     source: "Taksi Helsinki",
   },
   {
@@ -153,10 +141,8 @@ const modules = [
     description: "مصطلحات العمل، أسئلة أصلية للتدريب، والفرق بين اختبار الشركة واختبار Traficom.",
     duration: "90 دقيقة",
     lessons: 15,
-    progress: 48,
     icon: Brain,
     color: "blue",
-    status: "قيد الدراسة",
     source: "Taksi Helsinki · Traficom",
   },
   {
@@ -166,10 +152,8 @@ const modules = [
     description: "خريطة عملية لما هو منشور عن رحلات Kela، مع فصل قواعد Kela عن قواعد الشركة.",
     duration: "75 دقيقة",
     lessons: 13,
-    progress: 16,
     icon: HeartPulseIcon,
     color: "teal",
-    status: "لم تبدأ",
     source: "Kela · Taksi Helsinki",
   },
   {
@@ -179,10 +163,8 @@ const modules = [
     description: "ملاحظات للمراجعة حول الأماكن والرحلات، مع تنبيه واضح عندما لا توجد قائمة تشغيلية عامة.",
     duration: "60 دقيقة",
     lessons: 11,
-    progress: 0,
     icon: Map,
     color: "violet",
-    status: "مقفل حتى تكمل الأساسيات",
     source: "مصادر عامة موثقة",
   },
 ];
@@ -519,15 +501,6 @@ function App() {
   const [darkMode, setDarkMode] = useState(false);
   const [quizStarted, setQuizStarted] = useState(false);
   const [quizCompleted, setQuizCompleted] = useState(false);
-  const [studyProgress, setStudyProgress] = useState<StudyProgress>(() => {
-    if (typeof window === "undefined") return defaultStudyProgress;
-    try {
-      const saved = window.localStorage.getItem("taksi-pro-study-progress");
-      return saved ? { ...defaultStudyProgress, ...JSON.parse(saved) } : defaultStudyProgress;
-    } catch {
-      return defaultStudyProgress;
-    }
-  });
   const [quizIndex, setQuizIndex] = useState(0);
   const [selectedAnswer, setSelectedAnswer] = useState<number | null>(null);
   const [answers, setAnswers] = useState<Record<number, number>>({});
@@ -566,18 +539,6 @@ function App() {
       setSelectedAnswer(answers[quizIndex + 1] ?? null);
       return;
     }
-    const completedAnswers = { ...answers, [quizIndex]: selectedAnswer ?? answers[quizIndex] ?? -1 };
-    const finalScore = Object.entries(completedAnswers).filter(([index, answer]) => questions[Number(index)].answer === answer).length;
-    const nextProgress = {
-      bestScore: Math.max(studyProgress.bestScore, Math.round((finalScore / questions.length) * 100)),
-      sessions: studyProgress.sessions + 1,
-    };
-    setStudyProgress(nextProgress);
-    try {
-      window.localStorage.setItem("taksi-pro-study-progress", JSON.stringify(nextProgress));
-    } catch {
-      // Local progress is optional when browser storage is unavailable.
-    }
     setQuizCompleted(true);
   }
 
@@ -597,11 +558,6 @@ function App() {
           <div className="brand"><BrandMark /><div><strong>Taksi Pro</strong><span>سجلّ السائق الذكي</span></div></div>
           <button className="icon-button mobile-close" onClick={() => setMobileMenu(false)} aria-label="إغلاق القائمة"><X size={19} /></button>
         </div>
-        <div className="profile-card">
-          <div className="avatar">م</div>
-          <div className="profile-copy"><strong>مرحبًا، محمد</strong><span>رحلة السائق · 2026</span></div>
-          <MoreHorizontal size={18} className="muted-icon" />
-        </div>
         <nav className="main-nav">
           <p className="nav-label">مساحة الدراسة</p>
           {navItems.map(({ key, label, icon: Icon }) => <button key={key} className={`nav-item ${activeNav === key ? "active" : ""}`} onClick={() => navigate(key)}><Icon size={18} /><span>{label}</span>{key === "quiz" && <em>{questions.length}</em>}</button>)}
@@ -613,9 +569,9 @@ function App() {
       {mobileMenu && <button className="mobile-overlay" onClick={() => setMobileMenu(false)} aria-label="إغلاق القائمة" />}
 
       <main className="main-content">
-        <header className="topbar"><button className="icon-button menu-toggle" onClick={() => setMobileMenu(true)}><Menu size={20} /></button><div className="breadcrumbs"><span>مساحة الدراسة</span><ChevronLeft size={14} /><strong>{navItems.find((item) => item.key === activeNav)?.label}</strong></div><div className="topbar-actions"><div className="sync-status"><span className="status-dot" /> آخر حفظ منذ 3 دقائق</div><button className="icon-button"><Search size={18} /></button><button className="notification"><span>2</span><CircleHelp size={18} /></button><div className="top-avatar">م</div></div></header>
+        <header className="topbar"><button className="icon-button menu-toggle" onClick={() => setMobileMenu(true)}><Menu size={20} /></button><div className="breadcrumbs"><span>مساحة الدراسة</span><ChevronLeft size={14} /><strong>{navItems.find((item) => item.key === activeNav)?.label}</strong></div><div className="topbar-actions"><div className="sync-status"><span className="status-dot" /> دراسة عامة · لا حساب</div><button className="icon-button" aria-label="بحث"><Search size={18} /></button></div></header>
 
-        {activeNav === "home" && <Dashboard studyProgress={studyProgress} onStartQuiz={startQuiz} onNavigate={navigate} onOpenModule={(id) => { setSelectedModule(id); setActiveNav("path"); }} />}
+        {activeNav === "home" && <Dashboard onStartQuiz={startQuiz} onNavigate={navigate} onOpenModule={(id) => { setSelectedModule(id); setActiveNav("path"); }} />}
         {activeNav === "path" && <TrainingPath selectedModule={selectedModule} onSelectModule={setSelectedModule} onStartQuiz={startQuiz} />}
         {activeNav === "quiz" && <QuizView started={quizStarted} completed={quizCompleted} startQuiz={startQuiz} currentQuestion={currentQuestion} quizIndex={quizIndex} selectedAnswer={selectedAnswer} answers={answers} quizScore={quizScore} onAnswer={answerQuestion} onNext={nextQuestion} onRestart={startQuiz} onBack={() => { setQuizStarted(false); setQuizCompleted(false); setActiveNav("home"); }} />}
         {activeNav === "glossary" && <Glossary search={glossarySearch} onSearch={setGlossarySearch} terms={filteredGlossary} />}
@@ -698,24 +654,24 @@ function SourceRegistryView() {
   return <div className="page-wrap"><section className="page-heading"><div><div className="eyebrow-line"><Library size={15} /> سجل التحقق المحلي</div><h1>المصادر الرسمية</h1><p>Registry محلي يفصل الحالي والتاريخي والمستقبلي والوصول المقيد.</p></div><div className="source-heading-actions"><button className="secondary-button" onClick={verifySources} disabled={isVerifying}><ShieldCheck size={16} /> {isVerifying ? "جارٍ الفحص..." : "Verify Sources"}</button><div className="source-counter"><ShieldCheck size={18} /><strong>{sourceRegistry.length}</strong><span>سجل مصدر</span></div></div></section><div className="source-principles"><div><ShieldCheck size={21} /><div><strong>Tier 1 أولًا</strong><p>Taksi Helsinki للسياسات التشغيلية، ثم Kela وTraficom.</p></div></div><div><FileText size={21} /><div><strong>التاريخ والصفحة</strong><p>كل Evidence يذكر الإصدار أو الصفحة عند توفرها.</p></div></div><div><LockKeyhole size={21} /><div><strong>لا نتجاوز الحماية</strong><p>المواد الخاصة تبقى ACCESS_RESTRICTED.</p></div></div></div><div className="source-controls"><div className="search-box"><Search size={18} /><input value={query} onChange={(event) => setQuery(event.target.value)} placeholder="ابحث عن AD Kuljettaja أو Kela أو Cabman..." /><kbd>⌘ K</kbd></div><div className="source-filter-row">{([["all", "الكل"], ["current", "Current"], ["historical", "Historical"], ["future", "Future"], ["restricted", "وصول مقيد"]] as const).map(([value, label]) => <button key={value} className={statusFilter === value ? "active" : ""} onClick={() => setStatusFilter(value)}>{label}</button>)}</div></div>{verificationValues.length > 0 && <div className="source-verification-summary" aria-live="polite"><strong>نتيجة الفحص الحالي</strong><span>{reachableCount} رابط متاح أو hash مطابق</span><span>{changedCount} SOURCE_CHANGED</span><span>{unavailableCount} غير متاح أو محجوب</span><span>{restrictedCount} وصول مقيد دون طلب المحتوى</span><small>الفحص يستخدم HEAD للمصادر بلا baseline، وGET/ SHA-256 فقط عندما يوجد contentHash مسجل. لا يتم تحديث المحتوى تلقائيًا.</small></div>}<div className="sources-list">{filteredSources.map((source, index) => { const check = verification[source.id]; return <article className="source-card" key={source.id}><div className={`source-number ${["amber", "blue", "teal", "violet", "rose"][index % 5]}`}>{String(index + 1).padStart(2, "0")}</div><div className="source-card-body"><div className="source-title-row"><div><span>{source.publisher}</span><h3>{source.title}</h3></div><SourceStatusBadge status={source.status} /></div><div className="source-card-meta"><SourceBadge>{source.documentType}</SourceBadge><span><Clock3 size={13} /> نُشر/رُفع: {source.publicationDate}</span>{source.pages && <span><FileText size={13} /> {source.pages} صفحة</span>}</div>{check && <div className={`source-check-result check-${check.state}`}><span className="status-dot" /><span>{check.message}</span>{check.httpStatus && <small>HTTP {check.httpStatus}</small>}</div>}<div className="source-topics">{source.topics.map((topic) => <span key={topic}>{topic}</span>)}</div>{source.notes && <p className="source-note-text">{source.notes}</p>}<div className="source-record-footer"><span>Last verified: {source.lastVerified} · Used in {knowledgeLessons.filter((lesson) => lesson.sourceIds.includes(source.id)).length} lessons</span><a href={source.url} target="_blank" rel="noreferrer">فتح المصدر الأصلي <ArrowLeft size={14} /></a></div></div></article>; })}</div><div className="sources-disclaimer"><div className="note-icon"><Info size={18} /></div><p><strong>قاعدة عدم الهلوسة:</strong> ملفات Autocab ومواد Materiaalisalkku وإشعارات السائق لم تكن متاحة للقراءة العامة عند التحقق، لذلك تظهر كـ ACCESS_RESTRICTED. أما Mitax وSemel فتم تسجيلها لكن لم تُستخدم لإثبات أزرار غير مقروءة. أي SOURCE_CHANGED يحتاج إعادة تحليل بشرية قبل تحديث Evidence؛ لا يتم تجاوز تسجيل الدخول أو تعديل قاعدة المعرفة تلقائيًا.</p></div></div>;
 }
 
-function Dashboard({ studyProgress, onStartQuiz, onNavigate, onOpenModule }: { studyProgress: StudyProgress; onStartQuiz: () => void; onNavigate: (key: NavKey) => void; onOpenModule: (id: string) => void }) {
+function Dashboard({ onStartQuiz, onNavigate, onOpenModule }: { onStartQuiz: () => void; onNavigate: (key: NavKey) => void; onOpenModule: (id: string) => void }) {
   return <div className="page-wrap">
-    <section className="welcome-row"><div><div className="eyebrow-line"><Sparkles size={15} /> الخميس، 18 أغسطس 2026</div><h1>مساء الخير، محمد <span>👋</span></h1><p>خطوة واحدة كل يوم. اجعل معرفتك أهدأ من الطريق.</p></div><button className="primary-button" onClick={onStartQuiz}><Play size={17} fill="currentColor" /> ابدأ جلسة تدريب</button></section>
-    <section className="hero-panel"><div className="hero-copy"><div className="hero-kicker"><span className="live-dot" /> خطة Taksi Helsinki · المستوى الأول</div><h2>أنت على الطريق الصحيح<br /><em>واصل التقدم.</em></h2><p>راجعت 12 من أصل 16 درسًا. أكمل أساسيات المسار قبل الانتقال إلى التدريب الميداني.</p><div className="hero-actions"><button className="light-button" onClick={() => onOpenModule("01")}>متابعة الدرس <ArrowLeft size={16} /></button><span className="hero-meta"><Clock3 size={14} /> 18 دقيقة متبقية</span></div></div><div className="hero-orbit"><div className="orbit-ring ring-one" /><div className="orbit-ring ring-two" /><div className="orbit-core"><ShieldCheck size={35} /><span>82%</span></div><div className="orbit-chip chip-one"><Check size={13} /> اللغة</div><div className="orbit-chip chip-two"><Target size={13} /> المسار</div></div></section>
-    <div className="section-heading"><div><h2>لوحة التقدم</h2><p>مؤشراتك في هذه الرحلة التعليمية</p></div><button className="text-button" onClick={() => onNavigate("path")}>عرض المسار كاملًا <ArrowLeft size={15} /></button></div>
-    <section className="stats-grid"><StatCard icon={BarChart3} label="نسبة الإكمال" value="68%" note="+12% هذا الأسبوع" color="amber" /><StatCard icon={BookOpen} label="دروس مكتملة" value="12" note="من أصل 24 درسًا" color="blue" /><StatCard icon={Trophy} label="أفضل نتيجة" value={`${studyProgress.bestScore}%`} note={`${studyProgress.sessions} جلسة مكتملة`} color="teal" /><StatCard icon={Zap} label="أيام متتالية" value="4" note="هدفك: 7 أيام" color="violet" /></section>
-    <div className="content-grid"><section><div className="section-heading compact"><div><h2>مساراتك الحالية</h2><p>محتوى مختصر مع مرجع لكل محور</p></div><button className="text-button" onClick={() => onNavigate("path")}>كل المسارات <ArrowLeft size={15} /></button></div><div className="module-list">{modules.slice(0, 3).map((module) => <ModuleRow key={module.id} module={module} onClick={() => onOpenModule(module.id)} />)}</div></section><aside className="side-column"><div className="quiz-card"><div className="quiz-card-head"><div className="quiz-card-icon"><Brain size={20} /></div><span>تحدي اليوم</span><MoreHorizontal size={18} /></div><h3>هل أنت جاهز لاختبار قصير؟</h3><p>{questions.length} أسئلة أصلية مبنية على مصادر رسمية، بلا أسئلة امتحان مسرّبة.</p><div className="quiz-footer"><span><Clock3 size={14} /> 15 دقيقة</span><button onClick={onStartQuiz}>ابدأ <ArrowLeft size={14} /></button></div></div><div className="source-note"><div className="note-icon"><FileCheck2 size={18} /></div><div><strong>قاعدة المنصة</strong><p>نميز دائمًا بين <b>رسمي</b> و<b>شرح تعليمي</b> و<b>سؤال تدريبي</b>.</p></div></div></aside></div>
+    <section className="welcome-row"><div><div className="eyebrow-line"><Sparkles size={15} /> أكاديمية Taksi Helsinki · دراسة عامة</div><h1>مرحبًا بك في أكاديمية السائق <span>👋</span></h1><p>تعلّم من المصادر الرسمية، بدون حساب تجريبي أو بيانات مستخدم مسبقة.</p></div><button className="primary-button" onClick={onStartQuiz}><Play size={17} fill="currentColor" /> ابدأ جلسة تدريب</button></section>
+    <section className="hero-panel"><div className="hero-copy"><div className="hero-kicker"><span className="live-dot" /> مساحة دراسة عامة · بدون حساب</div><h2>تعلّم من المصدر<br /><em>وابنِ معرفتك بثقة.</em></h2><p>ابدأ بأي وحدة، وافتح المصدر الرسمي المرتبط بكل درس قبل اعتماد المعلومة.</p><div className="hero-actions"><button className="light-button" onClick={() => onOpenModule("01")}>ابدأ من المسار <ArrowLeft size={16} /></button><span className="hero-meta"><Clock3 size={14} /> مصادر رسمية مرتبطة بكل درس</span></div></div><div className="hero-orbit"><div className="orbit-ring ring-one" /><div className="orbit-ring ring-two" /><div className="orbit-core"><ShieldCheck size={35} /><span>موثق</span></div><div className="orbit-chip chip-one"><FileCheck2 size={13} /> المصادر</div><div className="orbit-chip chip-two"><BookOpen size={13} /> الدروس</div></div></section>
+    <div className="section-heading"><div><h2>ملخص المحتوى</h2><p>أرقام المحتوى الموثق، لا تقييمات المستخدمين</p></div><button className="text-button" onClick={() => onNavigate("path")}>عرض المسار كاملًا <ArrowLeft size={15} /></button></div>
+    <section className="stats-grid"><StatCard icon={BookOpen} label="دروس منظمة" value={`${knowledgeLessons.length}`} note="في قاعدة المعرفة" color="amber" /><StatCard icon={CircleHelp} label="أسئلة تدريبية" value={`${questions.length}`} note="ليست أسئلة امتحان" color="blue" /><StatCard icon={Library} label="مصادر مسجلة" value={`${sourceRegistry.length}`} note="Current / Historical / Future" color="teal" /><StatCard icon={ShieldCheck} label="حالة المنصة" value="عامة" note="بدون مستخدم افتراضي" color="violet" /></section>
+    <div className="content-grid"><section><div className="section-heading compact"><div><h2>مساراتك الحالية</h2><p>وحدات قابلة للفتح مع مرجع لكل محور</p></div><button className="text-button" onClick={() => onNavigate("path")}>كل المسارات <ArrowLeft size={15} /></button></div><div className="module-list">{modules.slice(0, 3).map((module) => <ModuleRow key={module.id} module={module} onClick={() => onOpenModule(module.id)} />)}</div></section><aside className="side-column"><div className="quiz-card"><div className="quiz-card-head"><div className="quiz-card-icon"><Brain size={20} /></div><span>تحدي اليوم</span><MoreHorizontal size={18} /></div><h3>هل أنت جاهز لاختبار قصير؟</h3><p>{questions.length} أسئلة أصلية مبنية على مصادر رسمية، بلا أسئلة امتحان مسرّبة.</p><div className="quiz-footer"><span><Clock3 size={14} /> 15 دقيقة</span><button onClick={onStartQuiz}>ابدأ <ArrowLeft size={14} /></button></div></div><div className="source-note"><div className="note-icon"><FileCheck2 size={18} /></div><div><strong>قاعدة المنصة</strong><p>نميز دائمًا بين <b>رسمي</b> و<b>شرح تعليمي</b> و<b>سؤال تدريبي</b>.</p></div></div></aside></div>
     <section className="bottom-strip"><div className="strip-icon"><FileText size={20} /></div><div><strong>آخر تحديث للمحتوى</strong><p>18 أغسطس 2026 · تم فحص صفحات Taksi Helsinki وTraficom وKela الرسمية.</p></div><button onClick={() => onNavigate("sources")}>راجع المصادر <ExternalLink size={15} /></button></section>
   </div>;
 }
 
 function StatCard({ icon: Icon, label, value, note, color }: { icon: typeof BarChart3; label: string; value: string; note: string; color: string }) {
-  return <div className="stat-card"><div className={`stat-icon ${color}`}><Icon size={18} /></div><div><span>{label}</span><strong>{value}</strong><small>{note}</small></div><ArrowUpLeft size={16} className="trend" /></div>;
+  return <div className="stat-card"><div className={`stat-icon ${color}`}><Icon size={18} /></div><div><span>{label}</span><strong>{value}</strong><small>{note}</small></div></div>;
 }
 
 function ModuleRow({ module, onClick }: { module: typeof modules[number]; onClick: () => void }) {
   const Icon = module.icon;
-  return <button className="module-row" onClick={onClick}><div className={`module-icon ${module.color}`}><Icon size={21} /></div><div className="module-main"><div className="module-title"><span className="module-number">{module.id}</span><strong>{module.title}</strong><SourceBadge>{module.source}</SourceBadge></div><p>{module.description}</p><div className="module-progress"><div className="progress-track"><span style={{ width: `${module.progress}%` }} /></div><small>{module.progress}%</small><span className="module-meta"><Clock3 size={13} /> {module.duration} <span>·</span> {module.lessons} دروس</span></div></div><ChevronLeft size={18} className="row-chevron" /></button>;
+  return <button className="module-row" onClick={onClick}><div className={`module-icon ${module.color}`}><Icon size={21} /></div><div className="module-main"><div className="module-title"><span className="module-number">{module.id}</span><strong>{module.title}</strong><SourceBadge>{module.source}</SourceBadge></div><p>{module.description}</p><div className="module-progress"><span className="module-meta"><Clock3 size={13} /> {module.duration} <span>·</span> {module.lessons} دروس</span><span className="module-content-label">محتوى موثق</span></div></div><ChevronLeft size={18} className="row-chevron" /></button>;
 }
 
 function TrainingPath({ selectedModule, onSelectModule, onStartQuiz }: { selectedModule: string; onSelectModule: (id: string) => void; onStartQuiz: () => void }) {
@@ -723,7 +679,7 @@ function TrainingPath({ selectedModule, onSelectModule, onStartQuiz }: { selecte
   const detail = moduleDetails[selectedModule as keyof typeof moduleDetails];
   const selected = modules.find((module) => module.id === selectedModule) ?? modules[0];
   const Icon = selected.icon;
-  return <div className="page-wrap"><section className="page-heading"><div><div className="eyebrow-line"><BookOpenCheck size={15} /> المنهج الموثق</div><h1>مسار التدريب</h1><p>محتوى عملي، مترجم، ومربوط بالمصدر الأصلي لكل موضوع.</p></div><button className="secondary-button" onClick={onStartQuiz}><Brain size={16} /> اختبر نفسك</button></section><div className="path-layout"><aside className="path-nav"><div className="path-nav-head"><span>المنهج الكامل</span><small>4 وحدات</small></div>{modules.map((module) => { const ModuleIcon = module.icon; return <button key={module.id} onClick={() => onSelectModule(module.id)} className={`path-nav-item ${selectedModule === module.id ? "selected" : ""}`}><div className={`module-icon small ${module.color}`}><ModuleIcon size={16} /></div><div><strong>{module.id} · {module.title}</strong><span>{module.progress === 0 ? "لم تبدأ" : `${module.progress}% مكتمل`}</span></div><ChevronLeft size={15} /></button>; })}<div className="path-total"><div className="circular-progress"><span>68%</span></div><div><strong>التقدم الكلي</strong><span>12 من 24 درسًا</span></div></div></aside><section className="lesson-panel"><div className={`lesson-banner ${selected.color}`}><div className="lesson-banner-copy"><span className="lesson-eyebrow">الوحدة {selected.id} · {selected.eyebrow}</span><h2>{selected.title}</h2><p>{selected.description}</p><SourceBadge>{selected.source}</SourceBadge></div><div className="lesson-visual"><Icon size={42} /><span>{selected.progress}%</span></div></div><div className="lesson-meta-row"><span><Clock3 size={15} /> {selected.duration}</span><span><BookOpen size={15} /> {selected.lessons} دروس</span><span><ShieldCheck size={15} /> مصدر لكل درس</span><button className="outline-button" onClick={onStartQuiz}><Play size={14} /> جلسة مراجعة</button></div><div className="lesson-list">{detail.map(([number, title, description], index) => <div className={`lesson-item ${index < Math.ceil(selected.progress / 25) ? "done" : ""}`} key={number}><div className="lesson-check">{index < Math.ceil(selected.progress / 25) ? <Check size={14} /> : <span>{number}</span>}</div><div className="lesson-item-copy"><div><strong>{title}</strong>{index < Math.ceil(selected.progress / 25) && <span className="completed-label">مكتمل</span>}</div><p>{description}</p></div><button className="lesson-open" onClick={() => setActiveLesson(activeLesson === number ? null : number)}>{activeLesson === number ? "إخفاء" : index < Math.ceil(selected.progress / 25) ? "مراجعة" : "فتح"} <ArrowLeft size={14} /></button>{activeLesson === number && <div className="lesson-preview"><strong>ملخص الدرس</strong><p>{description}</p><span><ShieldCheck size={13} /> شرح تعليمي مرتبط بالمحتوى الموثق</span><a href={moduleSourceUrls[selected.id]} target="_blank" rel="noreferrer">فتح المصدر الأصلي <ExternalLink size={12} /></a></div>}</div>)}</div><div className="verified-callout"><div><Info size={18} /></div><p><strong>ملاحظة منهجية:</strong> تفاصيل نظام السائق الداخلية، مثل أزرار Autocab أو إجراءات الأعطال، لا تُعرض كحقائق إلا إذا كانت في دليل رسمي عام قابل للتحقق. المحتوى المدفوع غير متاح لنا.</p></div></section></div></div>;
+  return <div className="page-wrap"><section className="page-heading"><div><div className="eyebrow-line"><BookOpenCheck size={15} /> المنهج الموثق</div><h1>مسار التدريب</h1><p>محتوى عملي، مترجم، ومربوط بالمصدر الأصلي لكل موضوع.</p></div><button className="secondary-button" onClick={onStartQuiz}><Brain size={16} /> اختبر نفسك</button></section><div className="path-layout"><aside className="path-nav"><div className="path-nav-head"><span>المنهج الكامل</span><small>4 وحدات</small></div>{modules.map((module) => { const ModuleIcon = module.icon; return <button key={module.id} onClick={() => onSelectModule(module.id)} className={`path-nav-item ${selectedModule === module.id ? "selected" : ""}`}><div className={`module-icon small ${module.color}`}><ModuleIcon size={16} /></div><div><strong>{module.id} · {module.title}</strong><span>{module.lessons} دروس موثقة</span></div><ChevronLeft size={15} /></button>; })}<div className="path-total"><div className="circular-progress"><BookOpen size={18} /></div><div><strong>المحتوى الكامل</strong><span>{knowledgeModules.length} محورًا موثقًا</span></div></div></aside><section className="lesson-panel"><div className={`lesson-banner ${selected.color}`}><div className="lesson-banner-copy"><span className="lesson-eyebrow">الوحدة {selected.id} · {selected.eyebrow}</span><h2>{selected.title}</h2><p>{selected.description}</p><SourceBadge>{selected.source}</SourceBadge></div><div className="lesson-visual"><Icon size={42} /><span>مصدر</span></div></div><div className="lesson-meta-row"><span><Clock3 size={15} /> {selected.duration}</span><span><BookOpen size={15} /> {selected.lessons} دروس</span><span><ShieldCheck size={15} /> مصدر لكل درس</span><button className="outline-button" onClick={onStartQuiz}><Play size={14} /> جلسة مراجعة</button></div><div className="lesson-list">{detail.map(([number, title, description], index) => <div className="lesson-item" key={number}><div className="lesson-check"><span>{number}</span></div><div className="lesson-item-copy"><div><strong>{title}</strong></div><p>{description}</p></div><button className="lesson-open" onClick={() => setActiveLesson(activeLesson === number ? null : number)}>{activeLesson === number ? "إخفاء" : "فتح"} <ArrowLeft size={14} /></button>{activeLesson === number && <div className="lesson-preview"><strong>ملخص الدرس</strong><p>{description}</p><span><ShieldCheck size={13} /> شرح تعليمي مرتبط بالمحتوى الموثق</span><a href={moduleSourceUrls[selected.id]} target="_blank" rel="noreferrer">فتح المصدر الأصلي <ExternalLink size={12} /></a></div>}</div>)}</div><div className="verified-callout"><div><Info size={18} /></div><p><strong>ملاحظة منهجية:</strong> تفاصيل نظام السائق الداخلية، مثل أزرار Autocab أو إجراءات الأعطال، لا تُعرض كحقائق إلا إذا كانت في دليل رسمي عام قابل للتحقق. المحتوى المدفوع غير متاح لنا.</p></div></section></div></div>;
 }
 
 function QuizView({ started, completed, startQuiz, currentQuestion, quizIndex, selectedAnswer, answers, quizScore, onAnswer, onNext, onRestart, onBack }: { started: boolean; completed: boolean; startQuiz: () => void; currentQuestion: Question; quizIndex: number; selectedAnswer: number | null; answers: Record<number, number>; quizScore: number; onAnswer: (answer: number) => void; onNext: () => void; onRestart: () => void; onBack: () => void }) {
