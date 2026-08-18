@@ -61,3 +61,4 @@ The workflow at `.github/workflows/deploy-pages.yml` builds the Vite study platf
 `https://bistrobellafin-sys.github.io/Fin-Taxi-preparing-/`
 
 The repository Pages setting uses **GitHub Actions** as its source and is enabled. Pushes to `main` trigger a new deployment automatically.
+Tue Aug 18 20:28:22 UTC 2026
