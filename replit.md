@@ -49,3 +49,11 @@ The platform uses public pages from Taksi Helsinki, Traficom, and Kela. It does 
 - `vite.config.ts` intentionally requires both `PORT` and `BASE_PATH`; keep them in preview/build commands.
 - The monorepo build output is under `artifacts/mockup-sandbox/dist` and `artifacts/api-server/dist`.
 - Do not treat prices, operational procedures, or internal application instructions as current unless a public official source verifies them.
+
+## GitHub Pages
+
+The workflow at `.github/workflows/deploy-pages.yml` builds the Vite study platform with the repository base path and deploys `artifacts/mockup-sandbox/dist` through GitHub Pages. After the first workflow run succeeds, the project URL is:
+
+`https://bistrobellafin-sys.github.io/Fin-Taxi-preparing-/`
+
+The repository Pages setting must use **GitHub Actions** as its source. Pushes to `main` and manual workflow runs trigger a new deployment.
