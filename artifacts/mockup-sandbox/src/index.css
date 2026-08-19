@@ -3,6 +3,22 @@
 
 @custom-variant dark (&:is(.dark *));
 
+/* Full lesson content in the training path */
+.lesson-item.expanded { flex-wrap: wrap; }
+.lesson-item-head { width: 100%; display: flex; align-items: flex-start; gap: 11px; }
+.lesson-item-title-row { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+.lesson-item-title-row .source-status-badge { flex-shrink: 0; }
+.lesson-item-copy { min-width: 0; }
+.lesson-item-copy strong, .lesson-item-copy p { overflow-wrap: anywhere; }
+.lesson-open { flex-shrink: 0; }
+.lesson-evidence-count { display: block; color: var(--teal); font-size: 8px; line-height: 1.6; margin-top: 6px; }
+.lesson-detail-expanded.knowledge-lesson-detail { width: calc(100% - 36px); margin: 10px 0 0 36px; padding: 16px 0 0; border-top: 1px solid var(--line); background: transparent; }
+.lesson-detail-kicker { display: flex; align-items: center; gap: 6px; color: var(--teal); font-size: 9px; font-weight: 700; margin-bottom: 15px; }
+.lesson-detail-expanded .detail-columns { gap: 20px; }
+.lesson-detail-expanded .evidence-panel { margin-top: 18px; }
+.lesson-detail-expanded .lesson-source-row { padding-bottom: 2px; }
+@media (max-width: 560px) { .lesson-detail-expanded.knowledge-lesson-detail { width: 100%; margin: 10px 0 0; } .lesson-detail-expanded .detail-columns { grid-template-columns: 1fr; } .lesson-detail-expanded .detail-columns > div:last-child { grid-column: auto; } .lesson-item-title-row { align-items: flex-start; flex-direction: column; gap: 5px; } .lesson-item-head { display: grid; grid-template-columns: 25px minmax(0, 1fr); align-items: start; } .lesson-item-head .lesson-check { grid-column: 1; grid-row: 1; } .lesson-item-head .lesson-item-copy { grid-column: 2; grid-row: 1; width: 100%; } .lesson-item-head .lesson-open { grid-column: 2; grid-row: 2; justify-self: start; margin-top: 8px; } .lesson-detail-expanded.knowledge-lesson-detail { margin-top: 13px; } }
+
 @theme inline {
   --radius-sm: calc(var(--radius) - 4px);
   --radius-md: calc(var(--radius) - 2px);
